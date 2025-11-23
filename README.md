@@ -26,5 +26,5 @@ mongodb
 
 postgre
 ```bash
-./migratepg.sh
+./cmd/migratepg.sh
 ```
