@@ -1,0 +1,83 @@
+[
+  {
+    "create": "student_achievements",
+    "validator": {
+      "$jsonSchema": {
+        "bsonType": "object",
+        "required": ["studentId", "achievementType", "title", "createdAt"],
+        "properties": {
+          "studentId": { "bsonType": "string" },
+          "achievementType": { "enum": ["academic", "competition", "organization", "publication", "certification", "other"] },
+          "title": { "bsonType": "string" },
+          "description": { "bsonType": "string" },
+          "details": {
+            "bsonType": "object",
+            "properties": {
+              "competitionName": { "bsonType": "string" },
+              "competitionLevel": { "enum": ["international", "national", "regional", "local"] },
+              "rank": { "bsonType": ["int", "double"] },
+              "medalType": { "bsonType": "string" },
+              "publicationType": { "enum": ["journal", "conference", "book"] },
+              "publicationTitle": { "bsonType": "string" },
+              "authors": { "bsonType": "array", "items": { "bsonType": "string" } },
+              "publisher": { "bsonType": "string" },
+              "issn": { "bsonType": "string" },
+              "organizationName": { "bsonType": "string" },
+              "position": { "bsonType": "string" },
+              "period": {
+                "bsonType": "object",
+                "properties": {
+                  "start": { "bsonType": "date" },
+                  "end": { "bsonType": "date" }
+                }
+              },
+              "certificationName": { "bsonType": "string" },
+              "issuedBy": { "bsonType": "string" },
+              "certificationNumber": { "bsonType": "string" },
+              "validUntil": { "bsonType": "date" },
+              "eventDate": { "bsonType": "date" },
+              "location": { "bsonType": "string" },
+              "organizer": { "bsonType": "string" },
+              "score": { "bsonType": ["int", "double"] },
+              "customFields": { "bsonType": "object" }
+            }
+          },
+          "attachments": {
+            "bsonType": "array",
+            "items": {
+              "bsonType": "object",
+              "required": ["fileUrl", "uploadedAt"],
+              "properties": {
+                "fileName": { "bsonType": "string" },
+                "fileUrl": { "bsonType": "string" },
+                "fileType": { "bsonType": "string" },
+                "uploadedAt": { "bsonType": "date" }
+              }
+            }
+          },
+          "tags": { "bsonType": "array", "items": { "bsonType": "string" } },
+          "points": { "bsonType": ["int", "double"] },
+          "createdAt": { "bsonType": "date" },
+          "updatedAt": { "bsonType": "date" }
+        }
+      }
+    }
+  },
+  {
+    "createIndexes": "student_achievements",
+    "indexes": [
+      {
+        "key": { "studentId": 1 },
+        "name": "studentId_1"
+      },
+      {
+        "key": { "achievementType": 1 },
+        "name": "achievementType_1"
+      },
+      {
+        "key": { "createdAt": -1 },
+        "name": "createdAt_-1"
+      }
+    ]
+  }
+]

@@ -24,3 +24,5 @@ func TestPostgreConnect_NotPanics(t *testing.T) {
 		assert.NotNil(t, db) 
 	})
 }
+
+
