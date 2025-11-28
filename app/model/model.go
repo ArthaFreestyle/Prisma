@@ -2,8 +2,8 @@ package model
 
 type WebResponse[T any] struct {
 	Data   T             `json:"data"`
-	Paging *PageMetaData `json:"paging"`
-	Errors string        `json:"errors"`
+	Paging *PageMetaData `json:"paging,omitempty"`
+	Errors string        `json:"errors,omitempty"`
 }
 
 type PageMetaData struct {

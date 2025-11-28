@@ -7,18 +7,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func generateToken(User model.UserResponse, jwsScret []byte) (string, string, error) {
+func GenerateToken(User *model.User, jwtSecret []byte) (string, string, error) {
 	var AccessExpiration = time.Now().Add(15 * time.Minute)
 	AccessClaims := model.Claims{
 		UserID:   User.ID,
 		Username: User.Username,
-		Role:     User.Role,
+		Role:     User.RoleName,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(AccessExpiration),
 		},
 	}
 	AccessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, AccessClaims)
-	accessString, err := AccessToken.SignedString(jwsScret)
+	accessString, err := AccessToken.SignedString(jwtSecret)
 	if err != nil {
 		return "", "", err
 	}
@@ -30,7 +30,7 @@ func generateToken(User model.UserResponse, jwsScret []byte) (string, string, er
 		},
 	}
 	RefreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, RefreshClaims)
-	refreshString, err := RefreshToken.SignedString([]byte(jwsScret))
+	refreshString, err := RefreshToken.SignedString([]byte(jwtSecret))
 
 	if err != nil {
 		return "", "", err
@@ -39,30 +39,30 @@ func generateToken(User model.UserResponse, jwsScret []byte) (string, string, er
 	return accessString, refreshString, nil
 }
 
-func RefreshToken(RefreshToken string, jwtConf []byte) (string, error) {
-	claims, err := ValidateToken(RefreshToken, jwtConf)
-
-	if err != nil {
-		return "", err
-	}
-
-	panic("Check Ke Redis Ntar")
-	AccessExpiration := time.Now().Add(15 * time.Minute)
-	AccessClaims := model.Claims{
-		UserID:   claims.ID,
-		Username: User.Username,
-		Role:     User.Role,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(AccessExpiration),
-		},
-	}
-	AccessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, AccessClaims)
-	accessString, err := AccessToken.SignedString(jwtConf)
-	if err != nil {
-		return "", err
-	}
-	return accessString, nil
-}
+//func RefreshToken(RefreshToken string, jwtConf []byte) (string, error) {
+//	claims, err := ValidateToken(RefreshToken, jwtConf)
+//
+//	if err != nil {
+//		return "", err
+//	}
+//
+//	panic("Check Ke Redis Ntar")
+//	AccessExpiration := time.Now().Add(15 * time.Minute)
+//	AccessClaims := model.Claims{
+//		UserID:   claims.ID,
+//		Username: User.Username,
+//		Role:     User.Role,
+//		RegisteredClaims: jwt.RegisteredClaims{
+//			ExpiresAt: jwt.NewNumericDate(AccessExpiration),
+//		},
+//	}
+//	AccessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, AccessClaims)
+//	accessString, err := AccessToken.SignedString(jwtConf)
+//	if err != nil {
+//		return "", err
+//	}
+//	return accessString, nil
+//}
 
 func ValidateToken(tokenString string, jwtSecret []byte) (*model.Claims, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &model.Claims{}, func(token *jwt.Token) (interface{}, error) {

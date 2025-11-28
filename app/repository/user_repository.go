@@ -42,7 +42,7 @@ func (repo *UserRepositoryImpl) Save(ctx context.Context, User model.User) (*mod
 }
 
 func (repo *UserRepositoryImpl) Update(ctx context.Context, User model.User) (*model.User, error) {
-	SQL := "UPDATE users SET username = ?,email = ? ,full_name = ? ,role_id = ? FROM users WHERE username = ?;"
+	SQL := "UPDATE users SET username = $1,email = $2 ,full_name = $3 ,role_id = $4 FROM users WHERE username = $5;"
 	res, err := repo.DB.ExecContext(ctx, SQL,
 		User.Username,
 		User.Email,
@@ -69,7 +69,7 @@ func (repo *UserRepositoryImpl) Update(ctx context.Context, User model.User) (*m
 }
 
 func (repo *UserRepositoryImpl) Delete(ctx context.Context, UserId int) error {
-	SQL := "DELETE FROM users WHERE id = ? ;"
+	SQL := "DELETE FROM users WHERE id = $1 ;"
 	_, err := repo.DB.ExecContext(ctx, SQL, UserId)
 	if err != nil {
 		repo.Log.Fatalf("Error deleting user into database: %v", err)
@@ -90,7 +90,7 @@ func (repo *UserRepositoryImpl) FindById(ctx context.Context, UserId int64) (*mo
     		INNER JOIN roles r ON u.role_id = r.id
 			LEFT JOIN role_permissions rp ON u.role_id = rp.role_id
 			LEFT JOIN permissions p ON rp.permission_id = p.id
-			WHERE u.id = ?
+			WHERE u.id = $1
 			GROUP BY u.id,u.email,u.username,u.full_name,r.name;`
 
 	var user model.User
@@ -165,7 +165,7 @@ func (repo *UserRepositoryImpl) FindByUsername(ctx context.Context, Username str
     		INNER JOIN roles r ON u.role_id = r.id
 			LEFT JOIN role_permissions rp ON u.role_id = rp.role_id
 			LEFT JOIN permissions p ON rp.permission_id = p.id
-			WHERE u.username = ?
+			WHERE u.username = $1 
 			GROUP BY u.id,u.username,u.full_name,u.password_hash,r.name;`
 
 	var user model.User
