@@ -8,7 +8,7 @@ import (
 )
 
 var Config = config.NewViper()
-var Log = config.Log(Config)
+var Log = config.NewLog(Config)
 
 func TestMongoConnect_NotPanics(t *testing.T) {
 

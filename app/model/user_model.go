@@ -5,17 +5,19 @@ type UserCreateRequest struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
 	FullName string `json:"full_name" validate:"required"`
+	RoleID   string `json:"role_id" validate:"required"`
 }
 
 type UserUpdateRequest struct {
-	ID       int64  `json:"id"`
+	ID       string `json:"id"`
 	Username string `json:"username" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
 	FullName string `json:"full_name" validate:"required"`
+	RoleID   string `json:"role_id" validate:"required"`
 }
 type LoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
 
 type LogoutRequest struct {
@@ -27,24 +29,33 @@ type RefreshTokenRequest struct {
 }
 
 type LoginResponse struct {
-	Token        string       `json:"token"`
-	RefreshToken string       `json:"refresh_token"`
-	User         UserResponse `json:"user"`
+	Token        string           `json:"token"`
+	RefreshToken string           `json:"refresh_token"`
+	User         UserAuthResponse `json:"user"`
 }
 
-type UserResponse struct {
-	ID          int64    `json:"id"`
+type UserAuthResponse struct {
+	ID          string   `json:"id"`
 	Username    string   `json:"username"`
 	FullName    string   `json:"full_name"`
 	Role        string   `json:"role"`
 	Permissions []string `json:"permissions"`
 }
 
+type UserResponse struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
+	FullName string `json:"full_name"`
+	Role     string `json:"role"`
+}
+
 type User struct {
-	ID           int64
+	ID           string
 	Username     string
 	PasswordHash string
+	Email        string
 	FullName     string
-	Role         string
-	Permissions  []string
+	RoleId       string
+	RoleName     string
+	Permissions  []PermissionUser
 }

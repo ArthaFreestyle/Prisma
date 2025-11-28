@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Log(viper *viper.Viper) *logrus.Logger {
+func NewLog(viper *viper.Viper) *logrus.Logger {
 	log := logrus.New()
 
 	log.SetLevel(logrus.Level(viper.GetInt32("log.level")))

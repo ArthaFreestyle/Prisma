@@ -6,9 +6,9 @@ import (
 	"github.com/spf13/viper"
 )
 
-func NewViper() *viper.Viper{
+func NewViper() *viper.Viper {
 	config := viper.New()
-	config.SetConfigFile("../config.json")
+	config.SetConfigFile("/home/artha/Documents/PRISMA/config.json")
 	err := config.ReadInConfig()
 
 	if err != nil {
