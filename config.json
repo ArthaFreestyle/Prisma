@@ -1,7 +1,8 @@
 {
     "app":{
         "name": "PRISMA",
-        "version": "1.0.0"
+        "version": "1.0.0",
+        "jwt-secret": "gua-ganteng-banget-anjay"
     },
     "web":{
         "host": "localhost",
@@ -19,6 +20,11 @@
             "port": 27017,
             "host": "localhost",
             "dbname": "prisma_db"
+        },
+        "redis": {
+          "port" : 6379,
+          "host" : "localhost",
+          "DB" : 0
         }
     }
 }
