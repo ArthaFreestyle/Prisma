@@ -7,4 +7,12 @@ Content-Type: application/json
     "password": "password"
 }
 
-### GET FindByID
+### POST logout
+POST http://127.0.0.1:3000/api/logout
+Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTM4MDUyNjYtYmRhZS00NjdlLWJjYjQtNjVhM2Q3ZDg2ZDk4IiwidXNlcm5hbWUiOiIiLCJyb2xlIjoiIiwiZXhwIjoxNzY0OTc3NTcwfQ.hpCkz3K6P3Y0gz0RgQ-bpEmPkmz-8hd0qtGzU2QNVoI
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTM4MDUyNjYtYmRhZS00NjdlLWJjYjQtNjVhM2Q3ZDg2ZDk4IiwidXNlcm5hbWUiOiJhbGFuIiwicm9sZSI6InN0dWRlbnQiLCJleHAiOjE3NjQzNzM2NzB9.n9ZKUcaOnY_MI05qz4ZrqY9OIv0IpTUUsIFtsBUSXKo
+
+
+### POST Refresh
+POST http://127.0.0.1:3000/api/refresh
+Cookie: refresh_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMTM4MDUyNjYtYmRhZS00NjdlLWJjYjQtNjVhM2Q3ZDg2ZDk4IiwidXNlcm5hbWUiOiJhbGFuIiwiZnVsbF9uYW1lIjoiQWxhbiBQcmF0YW1hIiwicm9sZSI6InN0dWRlbnQiLCJwZXJtaXNzaW9ucyI6W10sImV4cCI6MTc2NDk4NTMwMX0.ait7Xq_F2_Vze1e5w0D4vvXwhrdqHgTFOGiFnIUHmlk

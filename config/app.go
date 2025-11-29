@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"prisma/app/repository"
 	"prisma/app/service"
+	"prisma/middleware"
 	"prisma/routes"
 
 	"github.com/go-playground/validator/v10"
@@ -28,15 +29,16 @@ func Bootstrap(config *BootstrapConfig) {
 
 	//Setup Repository
 	UserRepository := repository.NewUserRepository(config.Postgres, config.Log)
+	LogoutRepository := repository.NewLogoutRepository(config.Redis, config.Log)
 
 	secret := []byte(config.Config.GetString("app.jwt-secret"))
 	//Setup Service
-	UserService := service.NewUserService(UserRepository, config.Log, secret)
+	UserService := service.NewUserService(UserRepository, LogoutRepository, config.Log, secret)
 
 	RouteConfig := routes.RouteConfig{
 		App:            config.App,
 		UserService:    UserService,
-		AuthMiddleware: nil,
+		AuthMiddleware: middleware.AuthRequired(secret),
 	}
 
 	RouteConfig.Setup()

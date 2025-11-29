@@ -20,12 +20,12 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-type LogoutRequest struct {
-	ID string `json:"id"`
-}
-
 type RefreshTokenRequest struct {
 	RefreshToken string `json:"refresh_token" validate:"required"`
+}
+
+type LogoutResponse struct {
+	Message string `json:"message"`
 }
 
 type LoginResponse struct {
