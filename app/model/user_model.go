@@ -35,11 +35,11 @@ type LoginResponse struct {
 }
 
 type UserAuthResponse struct {
-	ID          string           `json:"id"`
-	Username    string           `json:"username"`
-	FullName    string           `json:"full_name"`
-	Role        string           `json:"role"`
-	Permissions []PermissionUser `json:"permissions"`
+	ID          string   `json:"id"`
+	Username    string   `json:"username"`
+	FullName    string   `json:"full_name"`
+	Role        string   `json:"role"`
+	Permissions []string `json:"permissions"`
 }
 
 type UserResponse struct {
@@ -57,5 +57,5 @@ type User struct {
 	FullName     string
 	RoleId       string
 	RoleName     string
-	Permissions  []PermissionUser
+	Permissions  []string
 }

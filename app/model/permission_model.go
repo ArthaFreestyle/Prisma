@@ -1,6 +1,6 @@
 package model
 
 type PermissionUser struct {
-	resource string
-	action   string
+	Resource string `json:"resource"`
+	Action   string `json:"action"`
 }

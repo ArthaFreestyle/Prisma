@@ -8,7 +8,7 @@ import (
 
 type RouteConfig struct {
 	App            *fiber.App
-	UserService    service.UserService
+	UserService    service.AuthService
 	AuthMiddleware fiber.Handler
 }
 

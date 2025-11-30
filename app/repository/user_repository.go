@@ -156,11 +156,9 @@ func (repo *UserRepositoryImpl) FindAll(ctx context.Context) (*[]model.User, err
 func (repo *UserRepositoryImpl) FindByUsername(ctx context.Context, Username string) (*model.User, error) {
 	SQL := `SELECT u.id,u.username,u.full_name,u.password_hash,r.name,
 			COALESCE(
-					JSON_AGG(
-						JSON_BUILD_OBJECT('resource', p.resource, 'action', p.action)
-					) FILTER (WHERE p.id IS NOT NULL), 
-					'[]'
-				) as permissions
+        			TO_JSON(JSON_AGG(p.resource || ':' || p.action)),
+       			 '[]'
+    		) AS permissions
 			FROM users u 
     		INNER JOIN roles r ON u.role_id = r.id
 			LEFT JOIN role_permissions rp ON u.role_id = rp.role_id
@@ -169,22 +167,21 @@ func (repo *UserRepositoryImpl) FindByUsername(ctx context.Context, Username str
 			GROUP BY u.id,u.username,u.full_name,u.password_hash,r.name;`
 
 	var user model.User
-	var permissions []byte
+	var permStr string
 	err := repo.DB.QueryRowContext(ctx, SQL, Username).Scan(
 		&user.ID,
 		&user.Username,
 		&user.FullName,
 		&user.PasswordHash,
 		&user.RoleName,
-		&permissions,
+		&permStr,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := json.Unmarshal(permissions, &user.Permissions); err != nil {
+	if err := json.Unmarshal([]byte(permStr), &user.Permissions); err != nil {
 		return nil, fmt.Errorf("unmarshal permissions: %w", err)
 	}
-
 	return &user, nil
 }

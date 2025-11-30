@@ -33,7 +33,7 @@ func Bootstrap(config *BootstrapConfig) {
 
 	secret := []byte(config.Config.GetString("app.jwt-secret"))
 	//Setup Service
-	UserService := service.NewUserService(UserRepository, LogoutRepository, config.Log, secret)
+	UserService := service.NewAuthService(UserRepository, LogoutRepository, config.Log, secret)
 
 	RouteConfig := routes.RouteConfig{
 		App:            config.App,
