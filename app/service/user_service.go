@@ -64,7 +64,7 @@ func (s *UserServiceImpl) Create(c *fiber.Ctx) error {
 		if request.StudentProfile == nil {
 			return fiber.ErrBadRequest
 		}
-		student := model.Student{
+		student := &model.Student{
 			UserID:       user.ID,
 			StudentID:    request.StudentProfile.StudentID,
 			ProgramStudy: request.StudentProfile.ProgramStudy,
@@ -76,6 +76,19 @@ func (s *UserServiceImpl) Create(c *fiber.Ctx) error {
 			err = tx.Rollback()
 			return fiber.ErrInternalServerError
 		}
+		err = tx.Commit()
+		if err != nil {
+			return fiber.ErrInternalServerError
+		}
+		response := model.UserCreateResponse{
+			Username:       user.Username,
+			Email:          user.Email,
+			FullName:       user.FullName,
+			RoleID:         user.RoleId,
+			StudentProfile: student,
+		}
+
+		return c.Status(fiber.StatusOK).JSON(response)
 	} else if request.RoleID == "22222222-2222-2222-2222-222222222222" {
 		if request.LecturerProfile == nil {
 			return fiber.ErrBadRequest
@@ -90,9 +103,22 @@ func (s *UserServiceImpl) Create(c *fiber.Ctx) error {
 			err = tx.Rollback()
 			return fiber.ErrInternalServerError
 		}
+		err = tx.Commit()
+		if err != nil {
+			return fiber.ErrInternalServerError
+		}
+		response := model.UserCreateResponse{
+			Username:        user.Username,
+			Email:           user.Email,
+			FullName:        user.FullName,
+			RoleID:          user.RoleId,
+			LecturerProfile: lecturer,
+		}
+
+		return c.Status(fiber.StatusOK).JSON(response)
 	}
 
-	panic("implement me")
+	return fiber.ErrBadRequest
 }
 
 func (s *UserServiceImpl) Update(c *fiber.Ctx) error {

@@ -51,6 +51,15 @@ type UserResponse struct {
 	Role     string `json:"role"`
 }
 
+type UserCreateResponse struct {
+	Username        string    `json:"username"`
+	Email           string    `json:"email"`
+	FullName        string    `json:"full_name"`
+	RoleID          string    `json:"role_id"`
+	StudentProfile  *Student  `json:"student_profile,omitempty"`
+	LecturerProfile *Lecturer `json:"lecturer_profile,omitempty"`
+}
+
 type User struct {
 	ID           string
 	Username     string

@@ -9,7 +9,7 @@ import (
 )
 
 type StudentRepository interface {
-	Save(ctx context.Context, tx *sql.Tx, Student model.Student) (model.Student, error)
+	Save(ctx context.Context, tx *sql.Tx, Student *model.Student) (*model.Student, error)
 	FindAll(ctx context.Context, tx *sql.Tx) ([]model.Student, error)
 	FindById(ctx context.Context, tx *sql.Tx, id string) (*model.Student, error)
 }
@@ -18,22 +18,22 @@ type StudentRepositoryImpl struct {
 	Log *logrus.Logger
 }
 
-func (s StudentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, Student model.Student) (model.Student, error) {
+func (repo *StudentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, Student *model.Student) (*model.Student, error) {
 	SQL := "INSERT INTO students (user_id, student_id, program_study, academic_year, advisor_id) VALUES (?,?,?,?,?)"
 	err := tx.QueryRowContext(ctx, SQL, Student.UserID, Student.StudentID, Student.ProgramStudy, Student.AcademicYear, Student.AdvisorID).Scan(&Student.StudentID)
 	if err != nil {
-		return model.Student{}, err
+		return nil, err
 	}
 
 	return Student, nil
 }
 
-func (s StudentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]model.Student, error) {
+func (repo *StudentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]model.Student, error) {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s StudentRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (*model.Student, error) {
+func (repo *StudentRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id string) (*model.Student, error) {
 	//TODO implement me
 	panic("implement me")
 }
