@@ -11,7 +11,7 @@ import (
 )
 
 type UserRepository interface {
-	Save(ctx context.Context, User model.User) (*model.User, error)
+	Save(ctx context.Context, User *model.User) (*model.User, error)
 	Update(ctx context.Context, User model.User) (*model.User, error)
 	Delete(ctx context.Context, UserId int) error
 	FindById(ctx context.Context, UserId int64) (*model.User, error)
@@ -31,14 +31,14 @@ func NewUserRepository(DB *sql.DB, Log *logrus.Logger) UserRepository {
 	}
 }
 
-func (repo *UserRepositoryImpl) Save(ctx context.Context, User model.User) (*model.User, error) {
+func (repo *UserRepositoryImpl) Save(ctx context.Context, User *model.User) (*model.User, error) {
 	SQL := "INSERT INTO users (username, email, password_hash, full_name, role_id) VALUES ($1,$2,$3,$4,$5) returning id;"
 	err := repo.DB.QueryRowContext(ctx, SQL, User.Username, User.Email, User.PasswordHash, User.FullName, User.RoleId).Scan(&User.ID)
 	if err != nil {
 		repo.Log.Fatalf("Error inserting user into database: %v", err)
 		return nil, err
 	}
-	return &User, nil
+	return User, nil
 }
 
 func (repo *UserRepositoryImpl) Update(ctx context.Context, User model.User) (*model.User, error) {

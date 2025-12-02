@@ -1,11 +1,13 @@
 package model
 
 type UserCreateRequest struct {
-	Username string `json:"username" validate:"required"`
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required"`
-	FullName string `json:"full_name" validate:"required"`
-	RoleID   string `json:"role_id" validate:"required"`
+	Username        string          `json:"username" validate:"required"`
+	Email           string          `json:"email" validate:"required,email"`
+	Password        string          `json:"password" validate:"required"`
+	FullName        string          `json:"full_name" validate:"required"`
+	RoleID          string          `json:"role_id" validate:"required"`
+	StudentProfile  *StudentCreate  `json:"student_profile,omitempty"`
+	LecturerProfile *LecturerCreate `json:"lecturer_profile,omitempty"`
 }
 
 type UserUpdateRequest struct {
