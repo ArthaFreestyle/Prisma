@@ -19,7 +19,7 @@ type StudentRepositoryImpl struct {
 }
 
 func (repo *StudentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, Student *model.Student) (*model.Student, error) {
-	SQL := "INSERT INTO students (user_id, student_id, program_study, academic_year, advisor_id) VALUES (?,?,?,?,?)"
+	SQL := "INSERT INTO students (user_id, student_id, program_study, academic_year, advisor_id) VALUES (?,?,?,?,?) returning id"
 	err := tx.QueryRowContext(ctx, SQL, Student.UserID, Student.StudentID, Student.ProgramStudy, Student.AcademicYear, Student.AdvisorID).Scan(&Student.StudentID)
 	if err != nil {
 		return nil, err

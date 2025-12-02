@@ -19,8 +19,12 @@ type LecturerRepositoryImpl struct {
 }
 
 func (repo *LecturerRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, Lecturer *model.Lecturer) (*model.Lecturer, error) {
-	//TODO implement me
-	panic("implement me")
+	SQL := "INSERT INTO lecturers (user_id, lecturer_id, department, created_at) VALUES (?,?,?,?) returning id"
+	err := tx.QueryRowContext(ctx, SQL, Lecturer.UserID, Lecturer.LecturerID, Lecturer.Department, Lecturer.CreatedAt).Scan(&Lecturer.ID)
+	if err != nil {
+		return nil, err
+	}
+	return Lecturer, nil
 }
 
 func (repo *LecturerRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]model.Lecturer, error) {
