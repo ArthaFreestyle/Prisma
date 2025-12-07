@@ -14,6 +14,7 @@ func MongoConnect(config *viper.Viper, logs *logrus.Logger) *mongo.Database {
 
 	MongoPort := config.GetString("database.mongodb.port")
 	MongoHost := config.GetString("database.mongodb.host")
+	MongoDatabase := config.GetString("database.mongodb.dbname")
 	clientOptions := options.Client().ApplyURI("mongodb://" + MongoHost + ":" + MongoPort).SetMaxPoolSize(10).SetMinPoolSize(5).SetMaxConnIdleTime(10 * time.Minute)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -29,5 +30,5 @@ func MongoConnect(config *viper.Viper, logs *logrus.Logger) *mongo.Database {
 
 	logs.Info("Connected to MongoDB")
 
-	return client.Database(viper.GetString("database.mongodb.dbname"))
+	return client.Database(MongoDatabase)
 }
