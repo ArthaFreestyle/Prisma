@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"prisma/app/model"
 
@@ -14,7 +15,7 @@ type UserRepository interface {
 	Save(ctx context.Context, tx *sql.Tx, User *model.User) (*model.User, error)
 	Update(ctx context.Context, User model.User) (*model.User, error)
 	Delete(ctx context.Context, UserId int) error
-	FindById(ctx context.Context, UserId int64) (*model.User, error)
+	FindById(ctx context.Context, UserId string) (*model.UserProfile, error)
 	FindAll(ctx context.Context) (*[]model.User, error)
 	FindByUsername(ctx context.Context, Username string) (*model.User, error)
 }
@@ -78,33 +79,42 @@ func (repo *UserRepositoryImpl) Delete(ctx context.Context, UserId int) error {
 	return nil
 }
 
-func (repo *UserRepositoryImpl) FindById(ctx context.Context, UserId int64) (*model.User, error) {
-	SQL := `SELECT u.id,u.email,u.username,u.full_name,r.name,
-			COALESCE(
-					JSON_AGG(
-						JSON_BUILD_OBJECT('resource', p.resource, 'action', p.action)
-					) FILTER (WHERE p.id IS NOT NULL), 
-					'[]'
-				) as permissions
+func (repo *UserRepositoryImpl) FindById(ctx context.Context, UserId string) (*model.UserProfile, error) {
+	SQL := `SELECT u.id,u.email,u.username,u.full_name,u.role_id,r.name as role_name,
+       		s.id as student_id,
+       		s.program_study,
+			s.academic_year,
+			s.advisor_id,
+			s.created_at AS student_created_at,
+			l.id as lecturer_id,
+			l.department
 			FROM users u 
-    		INNER JOIN roles r ON u.role_id = r.id
-			LEFT JOIN role_permissions rp ON u.role_id = rp.role_id
-			LEFT JOIN permissions p ON rp.permission_id = p.id
-			WHERE u.id = $1
-			GROUP BY u.id,u.email,u.username,u.full_name,r.name;`
+    		INNER JOIN roles r ON u.role_id = r.id 
+			LEFT JOIN students s ON u.id = s.user_id
+			LEFT JOIN lecturers l ON u.id = l.user_id
+			WHERE u.id = $1;`
 
-	var user model.User
-	var permissions []byte
+	var user model.UserProfile
 	err := repo.DB.QueryRowContext(ctx, SQL, UserId).Scan(
-		&user.ID,
-		&user.Email,
-		&user.Username,
-		&user.FullName,
-		&user.RoleName,
-		&permissions)
+		&user.User.ID,
+		&user.User.Email,
+		&user.User.Username,
+		&user.User.FullName,
+		&user.User.RoleId,
+		&user.User.RoleName,
+		&user.StudentID,
+		&user.ProgramStudy,
+		&user.AcademicYear,
+		&user.AdvisorID,
+		&user.StudentCreatedAt,
+		&user.LecturerID,
+		&user.Department,
+	)
 
 	if err != nil {
-		repo.Log.Fatalf("Error finding user by id into database: %v", err)
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errors.New("user not found")
+		}
 		return nil, err
 	}
 

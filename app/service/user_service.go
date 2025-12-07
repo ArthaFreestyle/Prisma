@@ -170,12 +170,48 @@ func (s *UserServiceImpl) Delete(c *fiber.Ctx) error {
 }
 
 func (s *UserServiceImpl) FindById(c *fiber.Ctx) error {
-	//TODO implement me
-	panic("implement me")
+	var UserID = c.Params("id")
+	ctx := c.UserContext()
+	Users, err := s.repoUser.FindById(ctx, UserID)
+	if err != nil {
+		response := model.WebResponse[string]{
+			Status: "error",
+			Data:   "User not found",
+		}
+		return c.Status(fiber.StatusNotFound).JSON(response)
+	}
+	UserResponse := model.UserResponse{
+		ID:       Users.User.ID,
+		Username: Users.User.Username,
+		Email:    Users.User.Email,
+		FullName: Users.User.FullName,
+		Role:     Users.User.RoleName,
+	}
+
+	if Users.StudentID.Valid {
+		UserResponse.StudentProfile = &model.StudentCreate{
+			StudentID:    Users.StudentID.String,
+			ProgramStudy: Users.ProgramStudy.String,
+			AcademicYear: Users.AcademicYear.String,
+			AdvisorID:    Users.AdvisorID.String,
+		}
+	} else if Users.LecturerID.Valid {
+		UserResponse.LecturerProfile = &model.LecturerCreate{
+			LecturerID: Users.LecturerID.String,
+			Department: Users.Department.String,
+		}
+	}
+
+	response := model.WebResponse[model.UserResponse]{
+		Status: "success",
+		Data:   UserResponse,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
+
 }
 
 func (s *UserServiceImpl) FindAll(c *fiber.Ctx) error {
-	//TODO implement me
 
 	ctx := c.UserContext()
 	Users, err := s.repoUser.FindAll(ctx)
@@ -189,6 +225,7 @@ func (s *UserServiceImpl) FindAll(c *fiber.Ctx) error {
 	for _, u := range *Users {
 		userResponses = append(userResponses, model.UserResponse{
 			ID:       u.ID,
+			Email:    u.Email,
 			Username: u.Username,
 			FullName: u.FullName,
 			Role:     u.RoleName,

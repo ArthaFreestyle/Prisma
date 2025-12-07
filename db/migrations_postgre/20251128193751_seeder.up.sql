@@ -119,3 +119,21 @@ WHERE name IN (
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT '33333333-3333-3333-3333-333333333333', id
 FROM permissions;
+
+
+INSERT INTO lecturers (id, user_id, lecturer_id, department, created_at) VALUES
+    ('aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1',
+     (SELECT id FROM users WHERE username='budi'),
+     'LECT-2025-001',
+     'Computer Science',
+     '2025-01-01 00:00:00');
+
+
+INSERT INTO students (id, user_id, student_id, program_study, academic_year, advisor_id, created_at) VALUES
+    ('bbbbbbb1-bbbb-bbbb-bbbb-bbbbbbbbbbb1',
+     (SELECT id FROM users WHERE username='alan'),
+     'STUD-2025-001',
+     'Information Systems',
+     '2025/2026',
+     'aaaaaaa1-aaaa-aaaa-aaaa-aaaaaaaaaaa1',      -- advisor = lecturer budi
+     '2025-01-01 00:00:00');

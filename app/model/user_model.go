@@ -1,5 +1,7 @@
 package model
 
+import "database/sql"
+
 type UserCreateRequest struct {
 	Username        string          `json:"username" validate:"required"`
 	Email           string          `json:"email" validate:"required,email"`
@@ -47,10 +49,13 @@ type UserAuthResponse struct {
 }
 
 type UserResponse struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
-	FullName string `json:"full_name"`
-	Role     string `json:"role"`
+	ID              string          `json:"id"`
+	Email           string          `json:"email"`
+	Username        string          `json:"username"`
+	FullName        string          `json:"full_name"`
+	Role            string          `json:"role"`
+	StudentProfile  *StudentCreate  `json:"student_profile,omitempty"`
+	LecturerProfile *LecturerCreate `json:"lecturer_profile,omitempty"`
 }
 
 type UserCreateResponse struct {
@@ -72,4 +77,15 @@ type User struct {
 	RoleId       string
 	RoleName     string
 	Permissions  []string
+}
+
+type UserProfile struct {
+	User             User
+	StudentID        sql.NullString
+	ProgramStudy     sql.NullString
+	AcademicYear     sql.NullString
+	AdvisorID        sql.NullString
+	StudentCreatedAt sql.NullTime
+	LecturerID       sql.NullString
+	Department       sql.NullString
 }
