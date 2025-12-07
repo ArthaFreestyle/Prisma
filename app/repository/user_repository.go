@@ -14,7 +14,8 @@ import (
 type UserRepository interface {
 	Save(ctx context.Context, tx *sql.Tx, User *model.User) (*model.User, error)
 	Update(ctx context.Context, User model.User) (*model.User, error)
-	Delete(ctx context.Context, UserId int) error
+	UpdateRole(ctx context.Context, tx *sql.Tx, User model.User) (*model.User, error)
+	Delete(ctx context.Context, UserId string) error
 	FindById(ctx context.Context, UserId string) (*model.UserProfile, error)
 	FindAll(ctx context.Context) (*[]model.User, error)
 	FindByUsername(ctx context.Context, Username string) (*model.User, error)
@@ -23,6 +24,28 @@ type UserRepository interface {
 type UserRepositoryImpl struct {
 	DB  *sql.DB
 	Log *logrus.Logger
+}
+
+func (repo *UserRepositoryImpl) UpdateRole(ctx context.Context, tx *sql.Tx, User model.User) (*model.User, error) {
+	SQL := "UPDATE users SET role_id = $1 FROM users WHERE id = $2;"
+
+	res, err := tx.ExecContext(ctx, SQL, User.RoleId, User.ID)
+	if err != nil {
+		repo.Log.Fatalf("Error updating user into database: %v", err)
+		return nil, err
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		repo.Log.Fatalf("Error updating user into database: %v", err)
+		return nil, err
+	}
+
+	if rows == 0 {
+		return nil, errors.New("user not found")
+	} else {
+		return &User, nil
+	}
+
 }
 
 func NewUserRepository(DB *sql.DB, Log *logrus.Logger) UserRepository {
@@ -43,12 +66,11 @@ func (repo *UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, User *mode
 }
 
 func (repo *UserRepositoryImpl) Update(ctx context.Context, User model.User) (*model.User, error) {
-	SQL := "UPDATE users SET username = $1,email = $2 ,full_name = $3 ,role_id = $4 FROM users WHERE username = $5;"
+	SQL := "UPDATE users SET username = $1,email = $2 ,full_name = $3 FROM users WHERE id = $4;"
 	res, err := repo.DB.ExecContext(ctx, SQL,
 		User.Username,
 		User.Email,
 		User.FullName,
-		User.RoleId,
 		User.ID,
 	)
 
@@ -63,14 +85,14 @@ func (repo *UserRepositoryImpl) Update(ctx context.Context, User model.User) (*m
 	}
 
 	if rows == 0 {
-		return &model.User{}, nil
+		return nil, errors.New("user not found")
 	} else {
 		return &User, nil
 	}
 }
 
-func (repo *UserRepositoryImpl) Delete(ctx context.Context, UserId int) error {
-	SQL := "DELETE FROM users WHERE id = $1 ;"
+func (repo *UserRepositoryImpl) Delete(ctx context.Context, UserId string) error {
+	SQL := "DELETE FROM users WHERE id = $1;"
 	_, err := repo.DB.ExecContext(ctx, SQL, UserId)
 	if err != nil {
 		repo.Log.Fatalf("Error deleting user into database: %v", err)

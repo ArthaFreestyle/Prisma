@@ -12,10 +12,20 @@ type StudentRepository interface {
 	Save(ctx context.Context, tx *sql.Tx, Student *model.Student) (*model.Student, error)
 	FindAll(ctx context.Context, tx *sql.Tx) ([]model.Student, error)
 	FindById(ctx context.Context, tx *sql.Tx, id string) (*model.Student, error)
+	DeleteById(ctx context.Context, tx *sql.Tx, id string) error
 }
 
 type StudentRepositoryImpl struct {
 	Log *logrus.Logger
+}
+
+func (repo *StudentRepositoryImpl) DeleteById(ctx context.Context, tx *sql.Tx, id string) error {
+	SQL := "DELETE FROM students WHERE id = $1;"
+	_, err := tx.ExecContext(ctx, SQL, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func NewStudentRepositoryImpl(log *logrus.Logger) StudentRepository {

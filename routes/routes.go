@@ -29,5 +29,6 @@ func (c *RouteConfig) SetupAuthRoute() {
 	c.App.Post("/api/v1/users", c.UserService.Create)
 	c.App.Get("/api/v1/users", c.UserService.FindAll)
 	c.App.Get("/api/v1/users/:id", c.UserService.FindById)
+	c.App.Put("/api/v1/users/:id", c.UserService.Update)
 	c.App.Get("/api/v1/auth/profile", c.UserService.Profile)
 }

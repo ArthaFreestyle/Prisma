@@ -21,6 +21,12 @@ type UserUpdateRequest struct {
 	StudentProfile  *Student  `json:"student,omitempty"`
 	LecturerProfile *Lecturer `json:"lecturer,omitempty"`
 }
+
+type UserUpdateRole struct {
+	RoleID       string          `json:"role_id"`
+	StudentData  *StudentCreate  `json:"student,omitempty"`
+	LecturerData *LecturerCreate `json:"lecturer,omitempty"`
+}
 type LoginRequest struct {
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
@@ -66,6 +72,13 @@ type UserCreateResponse struct {
 	RoleID          string    `json:"role_id"`
 	StudentProfile  *Student  `json:"student_profile,omitempty"`
 	LecturerProfile *Lecturer `json:"lecturer_profile,omitempty"`
+}
+
+type UserUpdateResponse struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	FullName string `json:"full_name"`
 }
 
 type User struct {
