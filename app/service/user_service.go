@@ -242,13 +242,43 @@ func (s *UserServiceImpl) FindAll(c *fiber.Ctx) error {
 func (s *UserServiceImpl) Profile(c *fiber.Ctx) error {
 	ctx := c.UserContext()
 	val := ctx.Value("user")
+	UserId := val.(*model.Claims).UserID
 
-	response := &model.UserAuthResponse{
-		ID:          val.(*model.Claims).UserID,
-		Username:    val.(*model.Claims).Username,
-		FullName:    val.(*model.Claims).FullName,
-		Role:        val.(*model.Claims).Role,
-		Permissions: val.(*model.Claims).Permissions,
+	Users, err := s.repoUser.FindById(ctx, UserId)
+	if err != nil {
+		response := model.WebResponse[string]{
+			Status: "error",
+			Data:   "User not found",
+		}
+		return c.Status(fiber.StatusNotFound).JSON(response)
 	}
-	return c.JSON(response)
+
+	UserResponse := model.UserResponse{
+		ID:       Users.User.ID,
+		Username: Users.User.Username,
+		Email:    Users.User.Email,
+		FullName: Users.User.FullName,
+		Role:     Users.User.RoleName,
+	}
+
+	if Users.StudentID.Valid {
+		UserResponse.StudentProfile = &model.StudentCreate{
+			StudentID:    Users.StudentID.String,
+			ProgramStudy: Users.ProgramStudy.String,
+			AcademicYear: Users.AcademicYear.String,
+			AdvisorID:    Users.AdvisorID.String,
+		}
+	} else if Users.LecturerID.Valid {
+		UserResponse.LecturerProfile = &model.LecturerCreate{
+			LecturerID: Users.LecturerID.String,
+			Department: Users.Department.String,
+		}
+	}
+
+	response := model.WebResponse[model.UserResponse]{
+		Status: "success",
+		Data:   UserResponse,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
 }
