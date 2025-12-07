@@ -8,7 +8,8 @@ import (
 
 type RouteConfig struct {
 	App            *fiber.App
-	UserService    service.AuthService
+	AuthService    service.AuthService
+	UserService    service.UserService
 	AuthMiddleware fiber.Handler
 }
 
@@ -18,11 +19,14 @@ func (c *RouteConfig) Setup() {
 }
 
 func (c *RouteConfig) SetupGuestRoute() {
-	c.App.Post("/api/login", c.UserService.Login)
-	c.App.Post("/api/refresh", c.UserService.RefreshToken)
+	c.App.Post("/api/v1/auth/login", c.AuthService.Login)
+	c.App.Post("/api/v1/auth/refresh", c.AuthService.RefreshToken)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {
 	c.App.Use(c.AuthMiddleware)
-	c.App.Post("/api/logout", c.UserService.Logout)
+	c.App.Post("/api/v1/logout", c.AuthService.Logout)
+	c.App.Post("/api/v1/users", c.UserService.Create)
+	c.App.Get("/api/v1/users", c.UserService.FindAll)
+	c.App.Get("/api/v1/auth/profile", c.UserService.Profile)
 }

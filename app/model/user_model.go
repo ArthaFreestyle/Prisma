@@ -6,16 +6,18 @@ type UserCreateRequest struct {
 	Password        string          `json:"password" validate:"required"`
 	FullName        string          `json:"full_name" validate:"required"`
 	RoleID          string          `json:"role_id" validate:"required"`
-	StudentProfile  *StudentCreate  `json:"student_profile,omitempty"`
-	LecturerProfile *LecturerCreate `json:"lecturer_profile,omitempty"`
+	StudentProfile  *StudentCreate  `json:"student,omitempty"`
+	LecturerProfile *LecturerCreate `json:"lecturer,omitempty"`
 }
 
 type UserUpdateRequest struct {
-	ID       string `json:"id"`
-	Username string `json:"username" validate:"required"`
-	Email    string `json:"email" validate:"required,email"`
-	FullName string `json:"full_name" validate:"required"`
-	RoleID   string `json:"role_id" validate:"required"`
+	ID              string    `json:"id"`
+	Username        string    `json:"username" validate:"required"`
+	Email           string    `json:"email" validate:"required,email"`
+	FullName        string    `json:"full_name" validate:"required"`
+	RoleID          string    `json:"role_id" validate:"required"`
+	StudentProfile  *Student  `json:"student,omitempty"`
+	LecturerProfile *Lecturer `json:"lecturer,omitempty"`
 }
 type LoginRequest struct {
 	Username string `json:"username" validate:"required"`
@@ -52,6 +54,7 @@ type UserResponse struct {
 }
 
 type UserCreateResponse struct {
+	ID              string    `json:"id"`
 	Username        string    `json:"username"`
 	Email           string    `json:"email"`
 	FullName        string    `json:"full_name"`

@@ -11,7 +11,7 @@ import (
 )
 
 type UserRepository interface {
-	Save(ctx context.Context, User *model.User) (*model.User, error)
+	Save(ctx context.Context, tx *sql.Tx, User *model.User) (*model.User, error)
 	Update(ctx context.Context, User model.User) (*model.User, error)
 	Delete(ctx context.Context, UserId int) error
 	FindById(ctx context.Context, UserId int64) (*model.User, error)
@@ -31,9 +31,9 @@ func NewUserRepository(DB *sql.DB, Log *logrus.Logger) UserRepository {
 	}
 }
 
-func (repo *UserRepositoryImpl) Save(ctx context.Context, User *model.User) (*model.User, error) {
-	SQL := "INSERT INTO users (username, email, password_hash, full_name, role_id) VALUES ($1,$2,$3,$4,$5) returning id;"
-	err := repo.DB.QueryRowContext(ctx, SQL, User.Username, User.Email, User.PasswordHash, User.FullName, User.RoleId).Scan(&User.ID)
+func (repo *UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, User *model.User) (*model.User, error) {
+	SQL := `INSERT INTO users (username, email, password_hash, full_name, role_id) VALUES ($1, $2, $3, $4, $5) returning id`
+	err := tx.QueryRowContext(ctx, SQL, User.Username, User.Email, User.PasswordHash, User.FullName, User.RoleId).Scan(&User.ID)
 	if err != nil {
 		repo.Log.Fatalf("Error inserting user into database: %v", err)
 		return nil, err
@@ -112,18 +112,9 @@ func (repo *UserRepositoryImpl) FindById(ctx context.Context, UserId int64) (*mo
 }
 
 func (repo *UserRepositoryImpl) FindAll(ctx context.Context) (*[]model.User, error) {
-	SQL := `SELECT u.id,u.email,u.username,u.full_name,r.name,
-			COALESCE(
-					JSON_AGG(
-						JSON_BUILD_OBJECT('resource', p.resource, 'action', p.action)
-					) FILTER (WHERE p.id IS NOT NULL), 
-					'[]'
-				) as permissions
+	SQL := `SELECT u.id,u.email,u.username,u.full_name,r.name
 			FROM users u 
-    		INNER JOIN roles r ON u.role_id = r.id
-			LEFT JOIN role_permissions rp ON u.role_id = rp.role_id
-			LEFT JOIN permissions p ON rp.permission_id = p.id
-			GROUP BY u.id,u.email,u.username,u.full_name,r.name;`
+    		INNER JOIN roles r ON u.role_id = r.id`
 	rows, err := repo.DB.QueryContext(ctx, SQL)
 	if err != nil {
 		repo.Log.Fatalf("Error finding all users from database: %v", err)
@@ -132,21 +123,17 @@ func (repo *UserRepositoryImpl) FindAll(ctx context.Context) (*[]model.User, err
 	var users []model.User
 	for rows.Next() {
 		var user model.User
-		var permissions []byte
 		err := rows.Scan(
 			&user.ID,
 			&user.Email,
 			&user.Username,
 			&user.FullName,
-			&user.RoleName,
-			&permissions)
+			&user.RoleName)
 		if err != nil {
 			repo.Log.Fatalf("Error finding all users from database: %v", err)
 			return nil, err
 		}
-		if err := json.Unmarshal(permissions, &user.Permissions); err != nil {
-			return nil, fmt.Errorf("unmarshal permissions: %w", err)
-		}
+
 		users = append(users, user)
 	}
 

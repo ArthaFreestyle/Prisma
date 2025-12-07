@@ -17,6 +17,7 @@ type UserService interface {
 	Delete(c *fiber.Ctx) error
 	FindById(c *fiber.Ctx) error
 	FindAll(c *fiber.Ctx) error
+	Profile(c *fiber.Ctx) error
 }
 
 func NewUserService(repoUser repository.UserRepository, repoStudent repository.StudentRepository, repoLecturer repository.LecturerRepository, DB *sql.DB, validate *validator.Validate, log *logrus.Logger) UserService {
@@ -35,18 +36,29 @@ type UserServiceImpl struct {
 func (s *UserServiceImpl) Create(c *fiber.Ctx) error {
 	var request model.UserCreateRequest
 	if err := c.BodyParser(&request); err != nil {
-		return fiber.ErrBadRequest
+		s.Log.Info(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "gamasuk jier",
+		})
 	}
 
 	err := s.validate.Struct(request)
 	if err != nil {
-		return fiber.ErrBadRequest
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": err,
+		})
 	}
 	ctx := c.UserContext()
 	tx, err := s.DB.Begin()
+	if err != nil {
+		panic(err)
+	}
+
 	PasswordHash, err := utils.HashPassword(request.Password)
 	if err != nil {
-		return fiber.ErrInternalServerError
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
 	}
 	user := &model.User{
 		Username:     request.Username,
@@ -55,10 +67,12 @@ func (s *UserServiceImpl) Create(c *fiber.Ctx) error {
 		FullName:     request.FullName,
 		RoleId:       request.RoleID,
 	}
-	user, err = s.repoUser.Save(ctx, user)
+	user, err = s.repoUser.Save(ctx, tx, user)
 	if err != nil {
-		err = tx.Rollback()
-		return fiber.ErrInternalServerError
+		logrus.Error(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
 	}
 	if request.RoleID == "11111111-1111-1111-1111-111111111111" {
 		if request.StudentProfile == nil {
@@ -73,19 +87,22 @@ func (s *UserServiceImpl) Create(c *fiber.Ctx) error {
 		}
 		student, err = s.repoStudent.Save(ctx, tx, student)
 		if err != nil {
-			err = tx.Rollback()
+			tx.Rollback()
 			return fiber.ErrInternalServerError
 		}
-		err = tx.Commit()
-		if err != nil {
-			return fiber.ErrInternalServerError
-		}
-		response := model.UserCreateResponse{
+		utils.CommitOrRollback(tx)
+		UserData := model.UserCreateResponse{
+			ID:             user.ID,
 			Username:       user.Username,
 			Email:          user.Email,
 			FullName:       user.FullName,
 			RoleID:         user.RoleId,
 			StudentProfile: student,
+		}
+
+		response := model.WebResponse[model.UserCreateResponse]{
+			Status: "success",
+			Data:   UserData,
 		}
 
 		return c.Status(fiber.StatusOK).JSON(response)
@@ -100,14 +117,14 @@ func (s *UserServiceImpl) Create(c *fiber.Ctx) error {
 		}
 		lecturer, err := s.repoLecturer.Save(ctx, tx, lecturer)
 		if err != nil {
-			err = tx.Rollback()
-			return fiber.ErrInternalServerError
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": err.Error(),
+			})
 		}
-		err = tx.Commit()
-		if err != nil {
-			return fiber.ErrInternalServerError
-		}
-		response := model.UserCreateResponse{
+		utils.CommitOrRollback(tx)
+
+		UserData := model.UserCreateResponse{
+			ID:              user.ID,
 			Username:        user.Username,
 			Email:           user.Email,
 			FullName:        user.FullName,
@@ -115,10 +132,31 @@ func (s *UserServiceImpl) Create(c *fiber.Ctx) error {
 			LecturerProfile: lecturer,
 		}
 
+		response := model.WebResponse[model.UserCreateResponse]{
+			Status: "success",
+			Data:   UserData,
+		}
+
+		return c.Status(fiber.StatusOK).JSON(response)
+	} else if request.RoleID == "33333333-3333-3333-3333-333333333333" {
+		UserData := model.UserCreateResponse{
+			ID:       user.ID,
+			Username: user.Username,
+			Email:    user.Email,
+			FullName: user.FullName,
+			RoleID:   user.RoleId,
+		}
+
+		response := model.WebResponse[model.UserCreateResponse]{
+			Status: "success",
+			Data:   UserData,
+		}
+		utils.CommitOrRollback(tx)
 		return c.Status(fiber.StatusOK).JSON(response)
 	}
-
-	return fiber.ErrBadRequest
+	return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+		"error": "berikan role id yang benar",
+	})
 }
 
 func (s *UserServiceImpl) Update(c *fiber.Ctx) error {
@@ -138,5 +176,42 @@ func (s *UserServiceImpl) FindById(c *fiber.Ctx) error {
 
 func (s *UserServiceImpl) FindAll(c *fiber.Ctx) error {
 	//TODO implement me
-	panic("implement me")
+
+	ctx := c.UserContext()
+	Users, err := s.repoUser.FindAll(ctx)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	var userResponses []model.UserResponse
+	for _, u := range *Users {
+		userResponses = append(userResponses, model.UserResponse{
+			ID:       u.ID,
+			Username: u.Username,
+			FullName: u.FullName,
+			Role:     u.RoleName,
+		})
+	}
+	response := model.WebResponse[[]model.UserResponse]{
+		Status: "success",
+		Data:   userResponses,
+	}
+	return c.Status(fiber.StatusOK).JSON(response)
+
+}
+
+func (s *UserServiceImpl) Profile(c *fiber.Ctx) error {
+	ctx := c.UserContext()
+	val := ctx.Value("user")
+
+	response := &model.UserAuthResponse{
+		ID:          val.(*model.Claims).UserID,
+		Username:    val.(*model.Claims).Username,
+		FullName:    val.(*model.Claims).FullName,
+		Role:        val.(*model.Claims).Role,
+		Permissions: val.(*model.Claims).Permissions,
+	}
+	return c.JSON(response)
 }

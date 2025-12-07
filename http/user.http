@@ -1,5 +1,5 @@
 ### POST login
-POST http://127.0.0.1:3000/api/login
+POST http://127.0.0.1:3000/api/v1/auth/login
 Content-Type: application/json
 
 {

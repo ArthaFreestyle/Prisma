@@ -29,15 +29,19 @@ func Bootstrap(config *BootstrapConfig) {
 
 	//Setup Repository
 	UserRepository := repository.NewUserRepository(config.Postgres, config.Log)
+	StudentRepository := repository.NewStudentRepositoryImpl(config.Log)
+	LecturerRepository := repository.NewLecturerRepositoryImpl(config.Log)
 	LogoutRepository := repository.NewLogoutRepository(config.Redis, config.Log)
 
 	secret := []byte(config.Config.GetString("app.jwt-secret"))
 	//Setup Service
-	UserService := service.NewAuthService(UserRepository, LogoutRepository, config.Log, secret)
+	AuthService := service.NewAuthService(UserRepository, LogoutRepository, config.Log, secret)
+	UserService := service.NewUserService(UserRepository, StudentRepository, LecturerRepository, config.Postgres, config.Validate, config.Log)
 
 	RouteConfig := routes.RouteConfig{
 		App:            config.App,
 		UserService:    UserService,
+		AuthService:    AuthService,
 		AuthMiddleware: middleware.AuthRequired(secret),
 	}
 

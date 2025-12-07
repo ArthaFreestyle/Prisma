@@ -18,9 +18,15 @@ type StudentRepositoryImpl struct {
 	Log *logrus.Logger
 }
 
+func NewStudentRepositoryImpl(log *logrus.Logger) StudentRepository {
+	return &StudentRepositoryImpl{
+		Log: log,
+	}
+}
+
 func (repo *StudentRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, Student *model.Student) (*model.Student, error) {
-	SQL := "INSERT INTO students (user_id, student_id, program_study, academic_year, advisor_id) VALUES (?,?,?,?,?) returning id"
-	err := tx.QueryRowContext(ctx, SQL, Student.UserID, Student.StudentID, Student.ProgramStudy, Student.AcademicYear, Student.AdvisorID).Scan(&Student.StudentID)
+	SQL := "INSERT INTO students (user_id, student_id, program_study, academic_year, advisor_id) VALUES ($1,$2,$3,$4,$5) returning id"
+	err := tx.QueryRowContext(ctx, SQL, Student.UserID, Student.StudentID, Student.ProgramStudy, Student.AcademicYear, Student.AdvisorID).Scan(&Student.ID)
 	if err != nil {
 		return nil, err
 	}

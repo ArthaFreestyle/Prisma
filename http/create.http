@@ -1,0 +1,18 @@
+### POST create user Lecturer
+POST http://127.0.0.1:3000/api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNDM4YmZjM2EtMTliMS00ZmQwLTk1MTYtMzk5NWQ4ODY2Yzc4IiwidXNlcm5hbWUiOiJhbGFuIiwiZnVsbF9uYW1lIjoiQWxhbiBQcmF0YW1hIiwicm9sZSI6Im1haGFzaXN3YSIsInBlcm1pc3Npb25zIjpbImF1dGg6bG9naW4iLCJhdXRoOmxvZ291dCIsImF1dGg6cmVhZCIsImFjaGlldmVtZW50czpyZWFkIiwiYWNoaWV2ZW1lbnRzOnJlYWQiLCJhY2hpZXZlbWVudHM6Y3JlYXRlIiwiYWNoaWV2ZW1lbnRzOnVwZGF0ZSIsImFjaGlldmVtZW50czpkZWxldGUiLCJhY2hpZXZlbWVudHM6c3VibWl0IiwiYWNoaWV2ZW1lbnRzOnVwbG9hZCIsInN0dWRlbnRzOnJlYWQiLCJzdHVkZW50czpyZWFkQWNoaWV2ZW1lbnRzIl0sImV4cCI6MTc2NDk1NzQ2OX0.XbvgitQOxLwd2NHEV0GHvDBvwGCgAdYBx-BRCAjMUGE
+Content-Type: application/json
+
+{
+    "username": "dosen_03",
+    "email": "dosen03@univ.ac.id",
+    "password": "PasswordDosen123!",
+    "full_name": "Dr. Budi Santoso, M.Kom",
+    "role_id": "22222222-2222-2222-2222-222222222222",
+    "lecturer_profile": {
+        "lecturer_id": "NIP1980010120001",
+        "department": "Ilmu Komputer"
+    }
+}
+
+###
