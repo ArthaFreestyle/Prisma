@@ -54,6 +54,15 @@ type CreateAchievementRequest struct {
 	Tags            []string           `json:"tags"`
 }
 
+type UpdateAchievementRequest struct {
+	ID              string             `json:"id" validate:"required"`
+	AchievementType string             `json:"achievement_type" validate:"required"`
+	Title           string             `json:"title" validate:"required"`
+	Description     string             `json:"description" validate:"required"`
+	Details         AchievementDetails `json:"details"`
+	Tags            []string           `json:"tags"`
+}
+
 type AchievementReference struct {
 	ID                 string     `json:"id"`
 	StudentID          string     `json:"student_id"`
@@ -65,4 +74,7 @@ type AchievementReference struct {
 	CreatedAt          time.Time  `json:"created_at"`
 
 	Detail *AchievementMongo `json:"detail,omitempty"`
+}
+
+type AchievementResponse struct {
 }

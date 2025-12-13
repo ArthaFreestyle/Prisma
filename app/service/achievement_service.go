@@ -35,7 +35,7 @@ func NewAchievementService(repo repository.AchievementRepository, validate *vali
 	}
 }
 
-func (s AchievementServiceImpl) Create(c *fiber.Ctx) error {
+func (s *AchievementServiceImpl) Create(c *fiber.Ctx) error {
 	var request model.CreateAchievementRequest
 	if err := c.BodyParser(&request); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -71,42 +71,77 @@ func (s AchievementServiceImpl) Create(c *fiber.Ctx) error {
 
 }
 
-func (s AchievementServiceImpl) Update(c *fiber.Ctx) error {
+func (s *AchievementServiceImpl) Update(c *fiber.Ctx) error {
+	Id := c.Params("id")
+	var request model.UpdateAchievementRequest
+	if err := c.BodyParser(&request); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"status": "error",
+			"errors": err.Error(),
+		})
+	}
+	request.ID = Id
+	ctx := c.UserContext()
+	val := ctx.Value("user")
+	achievement := &model.AchievementMongo{
+		StudentID:       val.(*model.Claims).UserID,
+		AchievementType: request.AchievementType,
+		Title:           request.Title,
+		Description:     request.Description,
+		Details:         request.Details,
+		Tags:            request.Tags,
+	}
+
+	achievement, err := s.repoAchievement.Update(ctx, *achievement)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"status": "error",
+			"errors": err.Error(),
+		})
+	}
+
+	response := model.WebResponse[model.AchievementMongo]{
+		Status: "success",
+		Data:   *achievement,
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
+func (s *AchievementServiceImpl) Delete(c *fiber.Ctx) error {
+	//TODO implement me
+	Id := c.Params("id")
+	ctx := c.UserContext()
+
+	panic("implement me")
+}
+
+func (s *AchievementServiceImpl) FindByID(c *fiber.Ctx) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s AchievementServiceImpl) Delete(c *fiber.Ctx) error {
+func (s *AchievementServiceImpl) FindAll(c *fiber.Ctx) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s AchievementServiceImpl) FindByID(c *fiber.Ctx) error {
+func (s *AchievementServiceImpl) Verify(c *fiber.Ctx) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s AchievementServiceImpl) FindAll(c *fiber.Ctx) error {
+func (s *AchievementServiceImpl) Submit(c *fiber.Ctx) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s AchievementServiceImpl) Verify(c *fiber.Ctx) error {
+func (s *AchievementServiceImpl) History(c *fiber.Ctx) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (s AchievementServiceImpl) Submit(c *fiber.Ctx) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s AchievementServiceImpl) History(c *fiber.Ctx) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (s AchievementServiceImpl) Attachment(c *fiber.Ctx) error {
+func (s *AchievementServiceImpl) Attachment(c *fiber.Ctx) error {
 	//TODO implement me
 	panic("implement me")
 }

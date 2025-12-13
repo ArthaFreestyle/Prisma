@@ -7,7 +7,6 @@ CREATE TABLE achievement_references (
     verified_at TIMESTAMP,
     verified_by UUID,
     rejection_note TEXT,
-    is_deleted BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
 

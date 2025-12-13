@@ -9,7 +9,7 @@ import (
 )
 
 func GenerateToken(User *model.User, jwtSecret []byte) (string, string, error) {
-	var AccessExpiration = time.Now().Add(15 * time.Minute)
+	var AccessExpiration = time.Now().Add(60 * time.Minute)
 	AccessClaims := model.Claims{
 		UserID:      User.ID,
 		Username:    User.Username,
