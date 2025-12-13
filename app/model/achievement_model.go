@@ -64,17 +64,52 @@ type UpdateAchievementRequest struct {
 }
 
 type AchievementReference struct {
-	ID                 string     `json:"id"`
-	StudentID          string     `json:"student_id"`
-	MongoAchievementID string     `json:"mongo_achievement_id"`
-	Status             string     `json:"status"`
-	RejectionNote      string     `json:"rejection_note,omitempty"`
-	SubmittedAt        *time.Time `json:"submitted_at,omitempty"`
-	VerifiedAt         *time.Time `json:"verified_at,omitempty"`
-	CreatedAt          time.Time  `json:"created_at"`
-
-	Detail *AchievementMongo `json:"detail,omitempty"`
+	ID                 string            `json:"id"`
+	StudentID          string            `json:"student_id"`
+	MongoAchievementID string            `json:"mongo_achievement_id"`
+	Status             string            `json:"status"`
+	RejectionNote      string            `json:"rejection_note,omitempty"`
+	SubmittedAt        *time.Time        `json:"submitted_at,omitempty"`
+	VerifiedAt         *time.Time        `json:"verified_at,omitempty"`
+	VerifiedBy         string            `json:"verified_by,omitempty"`
+	CreatedAt          time.Time         `json:"created_at"`
+	Detail             *AchievementMongo `json:"detail,omitempty"`
 }
 
-type AchievementResponse struct {
+type AchievementReferenceDetail struct {
+	ID                 string            `json:"id"`
+	MongoAchievementID string            `json:"mongo_achievement_id"`
+	Status             string            `json:"status"`
+	RejectionNote      *string           `json:"rejection_note,omitempty"`
+	SubmittedAt        *time.Time        `json:"submitted_at,omitempty"`
+	VerifiedAt         *time.Time        `json:"verified_at,omitempty"`
+	VerifiedBy         *string           `json:"verified_by,omitempty"`
+	CreatedAt          time.Time         `json:"created_at"`
+	UpdatedAt          time.Time         `json:"updated_at"`
+	Detail             *AchievementMongo `json:"detail,omitempty"`
+	UserDetail         UserResponse      `json:"user_detail"`
+}
+
+type AchievementReferenceLecturer struct {
+	ID                 string            `json:"id"`
+	MongoAchievementID string            `json:"_"`
+	Student            UserResponse      `json:"student"`
+	Detail             *AchievementMongo `json:"detail,omitempty"`
+	Status             string            `json:"status"`
+}
+
+type AchievementReferenceStudent struct {
+	ID                 string            `json:"id"`
+	MongoAchievementID string            `json:"_"`
+	Detail             *AchievementMongo `json:"detail,omitempty"`
+	Status             string            `json:"status"`
+}
+
+type AchievementReferenceAdmin struct {
+	ID                 string            `json:"id"`
+	MongoAchievementID string            `json:"_"`
+	Student            UserResponse      `json:"student"`
+	Lecturer           UserResponse      `json:"lecturer"`
+	Detail             *AchievementMongo `json:"detail,omitempty"`
+	Status             string            `json:"status"`
 }

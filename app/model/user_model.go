@@ -55,11 +55,11 @@ type UserAuthResponse struct {
 }
 
 type UserResponse struct {
-	ID              string          `json:"id"`
+	ID              string          `json:"id,omitempty"`
 	Email           string          `json:"email"`
 	Username        string          `json:"username"`
 	FullName        string          `json:"full_name"`
-	Role            string          `json:"role"`
+	Role            string          `json:"role,omitempty"`
 	StudentProfile  *StudentCreate  `json:"student_profile,omitempty"`
 	LecturerProfile *LecturerCreate `json:"lecturer_profile,omitempty"`
 }
