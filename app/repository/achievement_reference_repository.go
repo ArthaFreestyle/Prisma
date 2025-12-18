@@ -5,10 +5,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"prisma/app/model"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 type AchievementReferenceRepository interface {
@@ -19,6 +20,7 @@ type AchievementReferenceRepository interface {
 	FindByLecturer(ctx context.Context, id string, page int, limit int) ([]model.AchievementReferenceLecturer, error)
 	FindByStudent(ctx context.Context, id string, page int, limit int) ([]model.AchievementReferenceStudent, error)
 	FindAll(ctx context.Context, page int, limit int) ([]model.AchievementReferenceAdmin, error)
+	FindByStudentId(ctx context.Context, id string, page int, limit int) ([]model.AchievementReferenceAdmin, error)
 }
 
 type achievementReferenceRepository struct {
@@ -31,6 +33,43 @@ func NewAchievementReferenceRepository(log *logrus.Logger, db *sql.DB) Achieveme
 		Log: log,
 		DB:  db,
 	}
+}
+
+func (repo *achievementReferenceRepository) FindByStudentId(ctx context.Context, id string, page int, limit int) ([]model.AchievementReferenceAdmin, error) {
+	skip := (page - 1) * limit
+	SQL := `SELECT a.id,a.mongo_achievement_id,a.status,u.username,u.full_name,u.email,
+			s.program_study,s.academic_year,s.student_id,l.department,u2.username,u2.email,u2.full_name FROM achievement_references a
+			JOIN students as s ON s.id = a.student_id
+			JOIN lecturers as l ON l.id = s.advisor_id
+            JOIN users as u ON u.id = s.user_id
+			JOIN users as u2 ON u2.id = l.user_id
+			WHERE a.status != 'DELETED' AND s.id = $1                                                                                  
+			LIMIT $2 OFFSET $3`
+
+	rows, err := repo.DB.QueryContext(ctx, SQL, id, limit, skip)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	achievements := []model.AchievementReferenceAdmin{}
+	for rows.Next() {
+		achievement := model.AchievementReferenceAdmin{}
+		err := rows.Scan(&achievement.ID, &achievement.MongoAchievementID, &achievement.Status,
+			&achievement.Student.Username, &achievement.Student.FullName, &achievement.Student.Email,
+			&achievement.Student.StudentProfile.ProgramStudy, &achievement.Student.StudentProfile.AcademicYear,
+			&achievement.Student.StudentProfile.StudentID, &achievement.Lecturer.LecturerProfile.Department, &achievement.Lecturer.Username,
+			&achievement.Lecturer.Email, &achievement.Lecturer.FullName)
+		if err != nil {
+			return nil, err
+		}
+		achievements = append(achievements, achievement)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return achievements, nil
 }
 
 func (repo *achievementReferenceRepository) Create(ctx context.Context, achievement model.AchievementReference) (*model.AchievementReference, error) {
@@ -192,7 +231,7 @@ func (repo *achievementReferenceRepository) FindByStudent(ctx context.Context, i
 			FROM achievement_references a
 			JOIN students as s ON s.id = a.student_id
             JOIN users as u ON u.id = s.user_id
-			WHERE s.user_id = $1 AND COALESCE(a.status, '') != 'DELETED'
+			WHERE s.user_id = $1 AND a.status != 'DELETED'
 			LIMIT $2 OFFSET $3`
 
 	rows, err := repo.DB.QueryContext(ctx, SQL, id, limit, skip)

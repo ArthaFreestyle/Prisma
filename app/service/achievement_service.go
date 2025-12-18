@@ -1,8 +1,11 @@
 package service
 
 import (
+	"fmt"
+	"os"
 	"prisma/app/model"
 	"prisma/app/repository"
+	"sort"
 	"time"
 
 	"github.com/go-playground/validator/v10"
@@ -21,6 +24,7 @@ type AchievementService interface {
 	Submit(c *fiber.Ctx) error
 	History(c *fiber.Ctx) error
 	Attachment(c *fiber.Ctx) error
+	Reject(c *fiber.Ctx) error
 }
 
 type AchievementServiceImpl struct {
@@ -124,6 +128,14 @@ func (s *AchievementServiceImpl) Update(c *fiber.Ctx) error {
 			Errors: err.Error(),
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	if val.(*model.Claims).Role == "mahasiswa" && Achievement.Status != "draft" {
+		response := model.WebResponse[string]{
+			Status: "error",
+			Errors: fmt.Sprintf("Achievement %s is already submitted", request.ID),
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(response)
 	}
 
 	id, err := primitive.ObjectIDFromHex(Achievement.ID)
@@ -394,9 +406,9 @@ func (s *AchievementServiceImpl) Verify(c *fiber.Ctx) error {
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(response)
 	}
-	Achievement.Status = AchievementRefer.Status
-	Achievement.VerifiedAt = Achievement.VerifiedAt
-	Achievement.VerifiedBy = Achievement.VerifiedBy
+	Achievement.Status = "verified"
+	Achievement.VerifiedBy = &val.(*model.Claims).UserID
+	Achievement.VerifiedAt = &now
 
 	response := model.WebResponse[*model.AchievementReferenceDetail]{
 		Status: "success",
@@ -450,11 +462,190 @@ func (s *AchievementServiceImpl) Submit(c *fiber.Ctx) error {
 }
 
 func (s *AchievementServiceImpl) History(c *fiber.Ctx) error {
-	//TODO implement me
-	panic("implement me")
+	id := c.Params("id")
+	ctx := c.UserContext()
+
+	achievement, err := s.repoAchivementReference.FindByID(ctx, id)
+	if err != nil {
+		response := model.WebResponse[string]{
+			Status: "error",
+			Errors: err.Error(),
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+
+	histories := make([]model.AchievementHistory, 0, 3)
+
+	histories = append(histories, model.AchievementHistory{
+		Action:    "Dibuat",
+		Timestamp: achievement.CreatedAt,
+	})
+
+	if achievement.SubmittedAt != nil {
+		histories = append(histories, model.AchievementHistory{
+			Action:    "Diajukan",
+			Timestamp: *achievement.SubmittedAt,
+		})
+	}
+
+	if achievement.VerifiedAt != nil {
+		actionLabel := "Diverifikasi"
+		if achievement.Status == "REJECTED" {
+			actionLabel = "Ditolak"
+		} else if achievement.Status == "APPROVED" {
+			actionLabel = "Disetujui"
+		}
+
+		histories = append(histories, model.AchievementHistory{
+			Action:    actionLabel,
+			Timestamp: *achievement.VerifiedAt,
+		})
+	}
+
+	sort.Slice(histories, func(i, j int) bool {
+		return histories[i].Timestamp.After(histories[j].Timestamp)
+	})
+
+	return c.JSON(model.WebResponse[[]model.AchievementHistory]{
+		Status: "success",
+		Data:   histories,
+	})
 }
 
 func (s *AchievementServiceImpl) Attachment(c *fiber.Ctx) error {
-	//TODO implement me
-	panic("implement me")
+	id := c.Params("id")
+	ctx := c.UserContext()
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(model.WebResponse[string]{
+			Status: "error",
+			Errors: "Gagal memproses form upload",
+		})
+	}
+
+	files := form.File["attachments"]
+	if len(files) == 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(model.WebResponse[string]{
+			Status: "error",
+			Errors: "Tidak ada file yang diupload",
+		})
+	}
+
+	achievementRef, err := s.repoAchivementReference.FindByID(ctx, id)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[string]{
+			Status: "error",
+			Errors: "Ref not found: " + err.Error(),
+		})
+	}
+
+	achievementObj, err := s.repoAchievement.FindById(ctx, achievementRef.MongoAchievementID)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[string]{
+			Status: "error",
+			Errors: "Detail not found: " + err.Error(),
+		})
+	}
+
+	var newAttachments []model.Attachment
+
+	baseDir := "./public/uploads/achievements"
+	baseURL := "/uploads/achievements"
+
+	if _, err := os.Stat(baseDir); os.IsNotExist(err) {
+		os.MkdirAll(baseDir, 0755)
+	}
+
+	for _, file := range files {
+		uniqueName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), file.Filename)
+		savePath := fmt.Sprintf("%s/%s", baseDir, uniqueName)
+
+		if err := c.SaveFile(file, savePath); err != nil {
+			response := model.WebResponse[string]{
+				Status: "error",
+				Errors: err.Error(),
+			}
+			return c.Status(fiber.StatusInternalServerError).JSON(response)
+		}
+
+		attachment := model.Attachment{
+			FileName:   file.Filename,
+			FileURL:    fmt.Sprintf("%s/%s", baseURL, uniqueName),
+			FileType:   file.Header.Get("Content-Type"),
+			UploadedAt: time.Now(),
+		}
+
+		newAttachments = append(newAttachments, attachment)
+	}
+
+	achievementObj.Attachments = append(achievementObj.Attachments, newAttachments...)
+
+	AchievementObj, err := s.repoAchievement.Update(ctx, *achievementObj)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(model.WebResponse[string]{
+			Status: "error",
+			Errors: "Gagal update database: " + err.Error(),
+		})
+	}
+
+	achievementRef.Detail = AchievementObj
+
+	return c.JSON(model.WebResponse[*model.AchievementReferenceDetail]{
+		Status: "success",
+		Data:   achievementRef,
+	})
+}
+
+func (s *AchievementServiceImpl) Reject(c *fiber.Ctx) error {
+	id := c.Params("id")
+	ctx := c.UserContext()
+	val := ctx.Value("user")
+
+	var request model.CreateRejection
+	if err := c.BodyParser(&request); err != nil {
+		response := model.WebResponse[string]{
+			Status: "error",
+			Errors: err.Error(),
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(response)
+	}
+
+	Achievement, err := s.repoAchivementReference.FindByID(ctx, id)
+	if err != nil {
+		response := model.WebResponse[string]{
+			Status: "error",
+			Errors: err.Error(),
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+	now := time.Now()
+	AchievementRefer := &model.AchievementReference{
+		MongoAchievementID: Achievement.MongoAchievementID,
+		StudentID:          Achievement.UserDetail.StudentProfile.StudentID,
+		ID:                 Achievement.ID,
+		Status:             "rejected",
+		RejectionNote:      request.RejectionNote,
+		SubmittedAt:        Achievement.SubmittedAt,
+		VerifiedAt:         &now,
+		VerifiedBy:         val.(*model.Claims).UserID,
+		Detail:             Achievement.Detail,
+	}
+
+	AchievementRefer, err = s.repoAchivementReference.Update(ctx, *AchievementRefer)
+	if err != nil {
+		response := model.WebResponse[string]{
+			Status: "error",
+			Errors: err.Error(),
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(response)
+	}
+	Achievement.Status = AchievementRefer.Status
+
+	response := model.WebResponse[*model.AchievementReferenceDetail]{
+		Status: "success",
+		Data:   Achievement,
+	}
+	return c.Status(fiber.StatusOK).JSON(response)
+
 }

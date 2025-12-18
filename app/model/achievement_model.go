@@ -122,3 +122,12 @@ type AchievementReferenceAdmin struct {
 	Status             string            `json:"status"`
 	CreatedAt          time.Time         `json:"created_at"`
 }
+
+type AchievementHistory struct {
+	Action    string    `json:"action"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+type CreateRejection struct {
+	RejectionNote string `json:"rejection_note"`
+}
