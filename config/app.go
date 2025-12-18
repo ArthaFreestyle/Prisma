@@ -29,14 +29,15 @@ func Bootstrap(config *BootstrapConfig) {
 
 	//Setup Repository
 	UserRepository := repository.NewUserRepository(config.Postgres, config.Log)
-	StudentRepository := repository.NewStudentRepositoryImpl(config.Log)
+	StudentRepository := repository.NewStudentRepositoryImpl(config.Log, config.Postgres)
 	LecturerRepository := repository.NewLecturerRepositoryImpl(config.Log)
 	LogoutRepository := repository.NewLogoutRepository(config.Redis, config.Log)
 	AchievementRepository := repository.NewAchievementRepository(config.MongoDB, config.Log)
+	AchievementRepositoryReference := repository.NewAchievementReferenceRepository(config.Log, config.Postgres)
 
 	secret := []byte(config.Config.GetString("app.jwt-secret"))
 	//Setup Service
-	AchievementService := service.NewAchievementService(AchievementRepository, config.Validate, config.Log)
+	AchievementService := service.NewAchievementService(AchievementRepository, StudentRepository, AchievementRepositoryReference, config.Validate, config.Log)
 	AuthService := service.NewAuthService(UserRepository, LogoutRepository, config.Log, secret)
 	UserService := service.NewUserService(UserRepository, StudentRepository, LecturerRepository, config.Postgres, config.Validate, config.Log)
 

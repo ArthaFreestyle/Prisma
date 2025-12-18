@@ -39,5 +39,6 @@ func (c *RouteConfig) SetupAuthRoute() {
 
 	//achievement
 	c.App.Post("/api/v1/achievements", c.AchievementService.Create)
+	c.App.Get("/api/v1/achievements", c.AchievementService.FindAll)
 
 }

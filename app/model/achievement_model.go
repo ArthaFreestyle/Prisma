@@ -92,24 +92,33 @@ type AchievementReferenceDetail struct {
 
 type AchievementReferenceLecturer struct {
 	ID                 string            `json:"id"`
-	MongoAchievementID string            `json:"_"`
+	MongoAchievementID string            `json:"-"`
 	Student            UserResponse      `json:"student"`
+	Title              string            `json:"title"`
+	Type               string            `json:"type"`
 	Detail             *AchievementMongo `json:"detail,omitempty"`
 	Status             string            `json:"status"`
+	CreatedAt          time.Time         `json:"created_at"`
 }
 
 type AchievementReferenceStudent struct {
 	ID                 string            `json:"id"`
-	MongoAchievementID string            `json:"_"`
+	Title              string            `json:"title"`
+	Type               string            `json:"type"`
+	CreatedAt          time.Time         `json:"created_at"`
+	MongoAchievementID string            `json:"-"`
 	Detail             *AchievementMongo `json:"detail,omitempty"`
 	Status             string            `json:"status"`
 }
 
 type AchievementReferenceAdmin struct {
 	ID                 string            `json:"id"`
-	MongoAchievementID string            `json:"_"`
+	MongoAchievementID string            `json:"-"`
+	Title              string            `json:"title"`
+	Type               string            `json:"type"`
 	Student            UserResponse      `json:"student"`
 	Lecturer           UserResponse      `json:"lecturer"`
 	Detail             *AchievementMongo `json:"detail,omitempty"`
 	Status             string            `json:"status"`
+	CreatedAt          time.Time         `json:"created_at"`
 }
