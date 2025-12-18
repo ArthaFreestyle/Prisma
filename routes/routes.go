@@ -32,7 +32,7 @@ func (c *RouteConfig) SetupGuestRoute() {
 
 func (c *RouteConfig) SetupAuthRoute() {
 	c.App.Use(c.AuthMiddleware)
-	c.App.Post("/api/v1/logout", c.AuthService.Logout)
+	c.App.Post("/api/v1/auth/logout", c.AuthService.Logout)
 	c.App.Get("/api/v1/auth/profile", c.UserService.Profile)
 
 	//users
@@ -53,7 +53,7 @@ func (c *RouteConfig) SetupAuthRoute() {
 	c.App.Post("/api/achievements/:id/verify", middleware.RequirePermission("achievements:verify"), c.AchievementService.Verify)
 	c.App.Post("/api/v1/achievements/:id/reject", middleware.RequirePermission("achievements:reject"), c.AchievementService.Reject)
 	c.App.Get("/api/v1/achievements/:id/history", middleware.RequirePermission("achievements:history"), c.AchievementService.History)
-	c.App.Post("/api/v1/achievements/:id/attachment", middleware.RequirePermission("achievements:uploadAttachment"), c.AchievementService.Attachment)
+	c.App.Post("/api/v1/achievements/:id/attachment", middleware.RequirePermission("achievements:upload"), c.AchievementService.Attachment)
 
 	//Student And Lecturer
 	c.App.Get("/api/v1/students", middleware.RequirePermission("students:list"), c.StudentService.FindAll)

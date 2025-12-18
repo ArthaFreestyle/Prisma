@@ -164,6 +164,8 @@ func (repo *achievementReferenceRepository) FindByID(ctx context.Context, id str
            WHERE a.id = $1 AND a.status != 'DELETED'`
 
 	achievement := model.AchievementReferenceDetail{}
+	achievement.UserDetail = model.UserResponse{}
+	achievement.UserDetail.StudentProfile = &model.StudentCreate{}
 
 	err := repo.DB.QueryRowContext(ctx, SQL, id).Scan(
 		&achievement.ID,
@@ -207,8 +209,10 @@ func (repo *achievementReferenceRepository) FindByLecturer(ctx context.Context, 
 	defer rows.Close()
 
 	achievements := []model.AchievementReferenceLecturer{}
+
 	for rows.Next() {
 		achievement := model.AchievementReferenceLecturer{}
+		achievement.Student = model.UserResponse{}
 		err := rows.Scan(&achievement.ID, &achievement.MongoAchievementID, &achievement.Status,
 			&achievement.Student.Username, &achievement.Student.FullName, &achievement.Student.Email,
 			&achievement.Student.StudentProfile.ProgramStudy, &achievement.Student.StudentProfile.AcademicYear,

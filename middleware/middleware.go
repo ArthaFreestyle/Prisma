@@ -2,11 +2,11 @@ package middleware
 
 import (
 	"context"
+	"prisma/app/model"
 	"prisma/utils"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 func AuthRequired(JWTsecret []byte) fiber.Handler {
@@ -41,23 +41,28 @@ func AuthRequired(JWTsecret []byte) fiber.Handler {
 
 func RequirePermission(requiredPerm string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		userToken := c.Locals("user").(*jwt.Token)
-		claims := userToken.Claims.(jwt.MapClaims)
-
-		rawPerms, ok := claims["permissions"].([]interface{})
-		if !ok {
-			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-				"message": "Permissions not found in token",
+		// 1. Safety check: Ensure the context value exists
+		userVal := c.UserContext().Value("user")
+		if userVal == nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"message": "User context not found",
 			})
 		}
 
+		// 2. Type Assertion: Ensure it's the correct Claims struct
+		claims, ok := userVal.(*model.Claims)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"message": "Invalid token structure",
+			})
+		}
+
+		// 3. Direct Check: No need for interface assertion, just loop the []string
 		hasPermission := false
-		for _, p := range rawPerms {
-			if strPerm, ok := p.(string); ok {
-				if strPerm == requiredPerm {
-					hasPermission = true
-					break
-				}
+		for _, p := range claims.Permissions {
+			if p == requiredPerm {
+				hasPermission = true
+				break
 			}
 		}
 

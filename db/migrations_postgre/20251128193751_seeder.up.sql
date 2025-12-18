@@ -31,8 +31,8 @@ VALUES
 -- =========================
 -- 5.2 Users (Admin)
 -- =========================
-('users:list', 'users', 'read', 'Melihat semua pengguna'),
-('users:detail', 'users', 'read', 'Melihat detail pengguna'),
+('users:list', 'users', 'list', 'Melihat semua pengguna'),
+('users:detail', 'users', 'detail', 'Melihat detail pengguna'),
 ('users:create', 'users', 'create', 'Menambahkan pengguna baru'),
 ('users:update', 'users', 'update', 'Mengubah data pengguna'),
 ('users:delete', 'users', 'delete', 'Menghapus pengguna'),
@@ -41,8 +41,8 @@ VALUES
 -- =========================
 -- 5.4 Achievements
 -- =========================
-('achievements:list', 'achievements', 'read', 'List semua achievement'),
-('achievements:detail', 'achievements', 'read', 'Detail achievement'),
+('achievements:list', 'achievements', 'list', 'List semua achievement'),
+('achievements:detail', 'achievements', 'detail', 'Detail achievement'),
 ('achievements:create', 'achievements', 'create', 'Mahasiswa membuat achievement'),
 ('achievements:update', 'achievements', 'update', 'Mahasiswa mengupdate achievement'),
 ('achievements:delete', 'achievements', 'delete', 'Mahasiswa menghapus achievement'),
@@ -55,12 +55,12 @@ VALUES
 -- =========================
 -- 5.5 Students & Lecturers
 -- =========================
-('students:list', 'students', 'read', 'List semua mahasiswa'),
-('students:detail', 'students', 'read', 'Detail mahasiswa'),
+('students:list', 'students', 'list', 'List semua mahasiswa'),
+('students:detail', 'students', 'detail', 'Detail mahasiswa'),
 ('students:achievements', 'students', 'readAchievements', 'List achievement mahasiswa'),
 ('students:updateAdvisor', 'students', 'updateAdvisor', 'Update dosen wali mahasiswa'),
 
-('lecturers:list', 'lecturers', 'read', 'List dosen'),
+('lecturers:list', 'lecturers', 'list', 'List dosen'),
 ('lecturers:advisees', 'lecturers', 'readAdvisees', 'List mahasiswa bimbingan'),
 
 -- =========================
