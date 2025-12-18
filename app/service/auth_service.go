@@ -33,6 +33,16 @@ type AuthServiceImpl struct {
 	secret   []byte
 }
 
+// Logout godoc
+// @Summary      Logout User
+// @Description  Invalidate refresh token and logout user.
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  model.WebResponse[model.LogoutResponse]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /auth/logout [post]
 func (s *AuthServiceImpl) Logout(c *fiber.Ctx) error {
 	refreshToken := c.Cookies("refresh_token")
 	ctx := c.UserContext()
@@ -52,6 +62,18 @@ func (s *AuthServiceImpl) Logout(c *fiber.Ctx) error {
 
 }
 
+// Login godoc
+// @Summary      Login User
+// @Description  Authenticate user and return access/refresh tokens.
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        request body model.LoginRequest true "Login Credentials"
+// @Success      200  {object}  model.WebResponse[model.LoginResponse]
+// @Failure      400  {object}  model.WebResponse[string]
+// @Failure      401  {object}  model.WebResponse[string]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Router       /auth/login [post]
 func (s *AuthServiceImpl) Login(c *fiber.Ctx) error {
 	var request = new(model.LoginRequest)
 	if err := c.BodyParser(request); err != nil {
@@ -93,6 +115,15 @@ func (s *AuthServiceImpl) Login(c *fiber.Ctx) error {
 	})
 }
 
+// RefreshToken godoc
+// @Summary      Refresh Access Token
+// @Description  Get a new access token using a valid refresh token from cookies.
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  model.WebResponse[model.LoginResponse]
+// @Failure      401  {object}  model.WebResponse[string]
+// @Router       /auth/refresh [post]
 func (s *AuthServiceImpl) RefreshToken(c *fiber.Ctx) error {
 	refreshToken := c.Cookies("refresh_token")
 	Claims, err := utils.ValidateToken(refreshToken, s.secret)

@@ -1,0 +1,1406 @@
+basePath: /api/v1
+definitions:
+  model.AchievementDetails:
+    properties:
+      competition_level:
+        type: string
+      competition_name:
+        description: Competition
+        type: string
+      end_date:
+        type: string
+      event_date:
+        description: General
+        type: string
+      location:
+        type: string
+      medal_type:
+        type: string
+      organization_name:
+        description: Organization
+        type: string
+      organizer:
+        type: string
+      position:
+        type: string
+      rank:
+        type: integer
+      start_date:
+        type: string
+    type: object
+  model.AchievementHistory:
+    properties:
+      action:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  model.AchievementMongo:
+    properties:
+      achievement_type:
+        type: string
+      attachments:
+        items:
+          $ref: '#/definitions/model.Attachment'
+        type: array
+      created_at:
+        type: string
+      description:
+        type: string
+      details:
+        $ref: '#/definitions/model.AchievementDetails'
+      id:
+        type: string
+      points:
+        type: integer
+      student_id:
+        description: Disimpan sebagai string UUID
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  model.AchievementReference:
+    properties:
+      created_at:
+        type: string
+      detail:
+        $ref: '#/definitions/model.AchievementMongo'
+      id:
+        type: string
+      mongo_achievement_id:
+        type: string
+      rejection_note:
+        type: string
+      status:
+        type: string
+      student_id:
+        type: string
+      submitted_at:
+        type: string
+      verified_at:
+        type: string
+      verified_by:
+        type: string
+    type: object
+  model.AchievementReferenceAdmin:
+    properties:
+      created_at:
+        type: string
+      detail:
+        $ref: '#/definitions/model.AchievementMongo'
+      id:
+        type: string
+      lecturer:
+        $ref: '#/definitions/model.UserResponse'
+      status:
+        type: string
+      student:
+        $ref: '#/definitions/model.UserResponse'
+      title:
+        type: string
+      type:
+        type: string
+    type: object
+  model.AchievementReferenceDetail:
+    properties:
+      created_at:
+        type: string
+      detail:
+        $ref: '#/definitions/model.AchievementMongo'
+      id:
+        type: string
+      mongo_achievement_id:
+        type: string
+      rejection_note:
+        type: string
+      status:
+        type: string
+      submitted_at:
+        type: string
+      updated_at:
+        type: string
+      user_detail:
+        $ref: '#/definitions/model.UserResponse'
+      verified_at:
+        type: string
+      verified_by:
+        type: string
+    type: object
+  model.Attachment:
+    properties:
+      file_name:
+        type: string
+      file_type:
+        type: string
+      file_url:
+        type: string
+      uploaded_at:
+        type: string
+    type: object
+  model.CreateAchievementRequest:
+    properties:
+      achievement_type:
+        type: string
+      description:
+        type: string
+      details:
+        $ref: '#/definitions/model.AchievementDetails'
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - achievement_type
+    - description
+    - title
+    type: object
+  model.CreateRejection:
+    properties:
+      rejection_note:
+        type: string
+    type: object
+  model.LecturerCreate:
+    properties:
+      department:
+        type: string
+      lecturer_id:
+        type: string
+    type: object
+  model.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  model.LoginResponse:
+    properties:
+      refresh_token:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/model.UserAuthResponse'
+    type: object
+  model.LogoutResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.PageMetaData:
+    properties:
+      page:
+        type: integer
+      size:
+        type: integer
+    type: object
+  model.Regional:
+    properties:
+      international:
+        type: integer
+      local:
+        type: integer
+      national:
+        type: integer
+      regional:
+        type: integer
+    type: object
+  model.Statistics:
+    properties:
+      data:
+        $ref: '#/definitions/model.Regional'
+      tahun:
+        type: string
+    type: object
+  model.StudentCreate:
+    properties:
+      academic_year:
+        type: string
+      advisor_id:
+        type: string
+      program_study:
+        type: string
+      student_id:
+        type: string
+    type: object
+  model.SwaggerChangeAdvisorRequest:
+    properties:
+      advisor:
+        example: uuid-of-advisor
+        type: string
+    type: object
+  model.SwaggerStudent:
+    properties:
+      academic_year:
+        type: string
+      advisor_id:
+        type: string
+      id:
+        type: string
+      program_study:
+        type: string
+      student_id:
+        type: string
+      user_id:
+        type: string
+    type: object
+  model.SwaggerUserProfile:
+    properties:
+      academic_year:
+        type: string
+      advisor_id:
+        type: string
+      department:
+        type: string
+      email:
+        type: string
+      fullname:
+        type: string
+      id:
+        type: string
+      lecturer_id:
+        type: string
+      program_study:
+        type: string
+      role_name:
+        type: string
+      student_id:
+        type: string
+      username:
+        type: string
+    type: object
+  model.SwaggerWebResponseAchievementReferenceAdmin:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.AchievementReferenceAdmin'
+        type: array
+      errors:
+        type: string
+      status:
+        type: string
+    type: object
+  model.SwaggerWebResponseInterface:
+    properties:
+      data: {}
+      errors:
+        type: string
+      status:
+        type: string
+    type: object
+  model.SwaggerWebResponseString:
+    properties:
+      data:
+        type: string
+      errors:
+        type: string
+      status:
+        type: string
+    type: object
+  model.SwaggerWebResponseStudent:
+    properties:
+      data:
+        $ref: '#/definitions/model.SwaggerStudent'
+      errors:
+        type: string
+      status:
+        type: string
+    type: object
+  model.SwaggerWebResponseUserProfile:
+    properties:
+      data:
+        $ref: '#/definitions/model.SwaggerUserProfile'
+      errors:
+        type: string
+      status:
+        type: string
+    type: object
+  model.SwaggerWebResponseUserProfiles:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.SwaggerUserProfile'
+        type: array
+      errors:
+        type: string
+      status:
+        type: string
+    type: object
+  model.SwaggerWebResponseUserResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.UserResponse'
+      errors:
+        type: string
+      status:
+        type: string
+    type: object
+  model.SwaggerWebResponseUserResponses:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.UserResponse'
+        type: array
+      errors:
+        type: string
+      status:
+        type: string
+    type: object
+  model.SwaggerWebResponseUserUpdateResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.UserUpdateResponse'
+      errors:
+        type: string
+      status:
+        type: string
+    type: object
+  model.UpdateAchievementRequest:
+    properties:
+      achievement_type:
+        type: string
+      description:
+        type: string
+      details:
+        $ref: '#/definitions/model.AchievementDetails'
+      id:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
+    required:
+    - achievement_type
+    - description
+    - id
+    - title
+    type: object
+  model.UserAuthResponse:
+    properties:
+      full_name:
+        type: string
+      id:
+        type: string
+      permissions:
+        items:
+          type: string
+        type: array
+      role:
+        type: string
+      username:
+        type: string
+    type: object
+  model.UserCreateRequest:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      lecturer:
+        $ref: '#/definitions/model.LecturerCreate'
+      password:
+        type: string
+      role_id:
+        type: string
+      student:
+        $ref: '#/definitions/model.StudentCreate'
+      username:
+        type: string
+    required:
+    - email
+    - full_name
+    - password
+    - role_id
+    - username
+    type: object
+  model.UserResponse:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      lecturer_profile:
+        $ref: '#/definitions/model.LecturerCreate'
+      role:
+        type: string
+      student_profile:
+        $ref: '#/definitions/model.StudentCreate'
+      username:
+        type: string
+    type: object
+  model.UserUpdateResponse:
+    properties:
+      email:
+        type: string
+      full_name:
+        type: string
+      id:
+        type: string
+      username:
+        type: string
+    type: object
+  model.UserUpdateRole:
+    properties:
+      lecturer:
+        $ref: '#/definitions/model.LecturerCreate'
+      role_id:
+        type: string
+      student:
+        $ref: '#/definitions/model.StudentCreate'
+    type: object
+  model.WebResponse-array_model_AchievementHistory:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.AchievementHistory'
+        type: array
+      errors:
+        type: string
+      paging:
+        $ref: '#/definitions/model.PageMetaData'
+      status:
+        type: string
+    type: object
+  model.WebResponse-array_model_AchievementReferenceDetail:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/model.AchievementReferenceDetail'
+        type: array
+      errors:
+        type: string
+      paging:
+        $ref: '#/definitions/model.PageMetaData'
+      status:
+        type: string
+    type: object
+  model.WebResponse-model_AchievementReference:
+    properties:
+      data:
+        $ref: '#/definitions/model.AchievementReference'
+      errors:
+        type: string
+      paging:
+        $ref: '#/definitions/model.PageMetaData'
+      status:
+        type: string
+    type: object
+  model.WebResponse-model_AchievementReferenceDetail:
+    properties:
+      data:
+        $ref: '#/definitions/model.AchievementReferenceDetail'
+      errors:
+        type: string
+      paging:
+        $ref: '#/definitions/model.PageMetaData'
+      status:
+        type: string
+    type: object
+  model.WebResponse-model_LoginResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.LoginResponse'
+      errors:
+        type: string
+      paging:
+        $ref: '#/definitions/model.PageMetaData'
+      status:
+        type: string
+    type: object
+  model.WebResponse-model_LogoutResponse:
+    properties:
+      data:
+        $ref: '#/definitions/model.LogoutResponse'
+      errors:
+        type: string
+      paging:
+        $ref: '#/definitions/model.PageMetaData'
+      status:
+        type: string
+    type: object
+  model.WebResponse-model_Statistics:
+    properties:
+      data:
+        $ref: '#/definitions/model.Statistics'
+      errors:
+        type: string
+      paging:
+        $ref: '#/definitions/model.PageMetaData'
+      status:
+        type: string
+    type: object
+  model.WebResponse-string:
+    properties:
+      data:
+        type: string
+      errors:
+        type: string
+      paging:
+        $ref: '#/definitions/model.PageMetaData'
+      status:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact:
+    email: support@prisma.com
+    name: API Support
+  description: API Documentation for Prisma Application
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Prisma API
+  version: "1.0"
+paths:
+  /achievements:
+    get:
+      consumes:
+      - application/json
+      description: Get achievements with pagination. Results filtered by user role
+        (admin, mahasiswa, lecturer).
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: integer
+      - description: Limit per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-array_model_AchievementReferenceDetail'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Get all achievements
+      tags:
+      - Achievement
+    post:
+      consumes:
+      - application/json
+      description: Create a new achievement draft for a student.
+      parameters:
+      - description: Create Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateAchievementRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_AchievementReference'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Create a new achievement
+      tags:
+      - Achievement
+  /achievements/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete achievement by ID.
+      parameters:
+      - description: Achievement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Delete an achievement
+      tags:
+      - Achievement
+    get:
+      consumes:
+      - application/json
+      description: Retrieve full details of an achievement including mongo data.
+      parameters:
+      - description: Achievement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_AchievementReferenceDetail'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Get achievement by ID
+      tags:
+      - Achievement
+    put:
+      consumes:
+      - application/json
+      description: Update achievement details. Students can only update if status
+        is 'draft'.
+      parameters:
+      - description: Achievement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateAchievementRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_AchievementReferenceDetail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Update an achievement
+      tags:
+      - Achievement
+  /achievements/{id}/attachments:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload file attachments for an achievement.
+      parameters:
+      - description: Achievement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Files to upload
+        in: formData
+        name: attachments
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_AchievementReferenceDetail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Upload attachment
+      tags:
+      - Achievement
+  /achievements/{id}/history:
+    get:
+      consumes:
+      - application/json
+      description: Get the timeline history of an achievement.
+      parameters:
+      - description: Achievement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-array_model_AchievementHistory'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Get achievement history
+      tags:
+      - Achievement
+  /achievements/{id}/reject:
+    post:
+      consumes:
+      - application/json
+      description: Reject a submitted achievement with a note.
+      parameters:
+      - description: Achievement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rejection Note
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateRejection'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_AchievementReferenceDetail'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Reject an achievement
+      tags:
+      - Achievement
+  /achievements/{id}/submit:
+    patch:
+      consumes:
+      - application/json
+      description: Submit an achievement for review.
+      parameters:
+      - description: Achievement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_AchievementReferenceDetail'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Submit an achievement
+      tags:
+      - Achievement
+  /achievements/{id}/verify:
+    patch:
+      consumes:
+      - application/json
+      description: Mark an achievement as verified.
+      parameters:
+      - description: Achievement ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_AchievementReferenceDetail'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Verify an achievement
+      tags:
+      - Achievement
+  /analytics:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve general system statistics and analytics data.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_Statistics'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_Statistics'
+      security:
+      - BearerAuth: []
+      summary: Get General Analytics
+      tags:
+      - Analytics
+  /analytics/report/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve specific analytics report by ID.
+      parameters:
+      - description: Report ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_Statistics'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_Statistics'
+      security:
+      - BearerAuth: []
+      summary: Get Specific Report
+      tags:
+      - Analytics
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user and return access/refresh tokens.
+      parameters:
+      - description: Login Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_LoginResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      summary: Login User
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Invalidate refresh token and logout user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_LogoutResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      security:
+      - BearerAuth: []
+      summary: Logout User
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Get a new access token using a valid refresh token from cookies.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.WebResponse-model_LoginResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.WebResponse-string'
+      summary: Refresh Access Token
+      tags:
+      - Auth
+  /lecturers:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all lecturers
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved lecturers
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseUserProfiles'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+      security:
+      - BearerAuth: []
+      summary: Get all lecturers
+      tags:
+      - Lecturers
+  /lecturers/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve lecturer profile details by ID
+      parameters:
+      - description: Lecturer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved lecturer
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseUserProfile'
+        "400":
+          description: Lecturer not found
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+      security:
+      - BearerAuth: []
+      summary: Get lecturer by ID
+      tags:
+      - Lecturers
+  /lecturers/{id}/advices:
+    get:
+      consumes:
+      - application/json
+      description: Get list of students advised by a specific lecturer
+      parameters:
+      - description: Lecturer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved advised students
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseUserProfiles'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+      security:
+      - BearerAuth: []
+      summary: Get advised students
+      tags:
+      - Lecturers
+  /students:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of all students profiles
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved students
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseUserProfiles'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+      security:
+      - BearerAuth: []
+      summary: Get all students
+      tags:
+      - Students
+  /students/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve detailed student profile by ID
+      parameters:
+      - description: Student ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved student
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseUserProfile'
+        "400":
+          description: Student not found
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+      security:
+      - BearerAuth: []
+      summary: Get student by ID
+      tags:
+      - Students
+  /students/{id}/achievements:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve list of achievements belonging to a student with pagination
+      parameters:
+      - description: Student ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Page size
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved achievements
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseAchievementReferenceAdmin'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+      security:
+      - BearerAuth: []
+      summary: Get student achievements
+      tags:
+      - Students
+  /students/{id}/advisor:
+    patch:
+      consumes:
+      - application/json
+      description: Assign or change the academic advisor for a student
+      parameters:
+      - description: Student ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Advisor ID payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.SwaggerChangeAdvisorRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully changed advisor
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseStudent'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+      security:
+      - BearerAuth: []
+      summary: Change student advisor
+      tags:
+      - Students
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: Get list of all users
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved users
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseUserResponses'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get all users
+      tags:
+      - Users
+    post:
+      consumes:
+      - application/json
+      description: Create a new user with role-specific profile (student/lecturer/admin)
+      parameters:
+      - description: User creation request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully created user
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseInterface'
+        "400":
+          description: Bad request - validation error or missing profile data
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create new user
+      tags:
+      - Users
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully deleted user
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+        "400":
+          description: Bad request - user not found
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete user
+      tags:
+      - Users
+    get:
+      consumes:
+      - application/json
+      description: Get user details by ID including role-specific profile
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved user
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseUserResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+      security:
+      - BearerAuth: []
+      summary: Get user by ID
+      tags:
+      - Users
+    put:
+      consumes:
+      - application/json
+      description: Update user's basic information (username, email, fullname)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated user
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseUserUpdateResponse'
+        "400":
+          description: Bad request - invalid input
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+      security:
+      - BearerAuth: []
+      summary: Update user information
+      tags:
+      - Users
+  /users/{id}/role:
+    put:
+      consumes:
+      - application/json
+      description: Update user role and associated profile data (student/lecturer)
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: User role update request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.UserUpdateRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully updated user role
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseInterface'
+        "400":
+          description: Bad request - invalid input or role ID
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update user role
+      tags:
+      - Users
+  /users/profile:
+    get:
+      consumes:
+      - application/json
+      description: Get authenticated user's profile information
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully retrieved profile
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseUserResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/model.SwaggerWebResponseString'
+      security:
+      - BearerAuth: []
+      summary: Get current user profile
+      tags:
+      - Users
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

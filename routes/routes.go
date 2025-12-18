@@ -4,6 +4,7 @@ import (
 	"prisma/app/service"
 	"prisma/middleware"
 
+	swagger "github.com/arsmn/fiber-swagger/v2"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -26,6 +27,7 @@ func (c *RouteConfig) Setup() {
 func (c *RouteConfig) SetupGuestRoute() {
 	c.App.Post("/api/v1/auth/login", c.AuthService.Login)
 	c.App.Post("/api/v1/auth/refresh", c.AuthService.RefreshToken)
+	c.App.Get("/swagger/*", swagger.HandlerDefault)
 }
 
 func (c *RouteConfig) SetupAuthRoute() {

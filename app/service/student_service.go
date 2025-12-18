@@ -27,6 +27,16 @@ func NewStudentService(repoStudent repository.StudentRepository, repoAchievement
 	}
 }
 
+// FindAll godoc
+// @Summary Get all students
+// @Description Retrieve a list of all students profiles
+// @Tags Students
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.SwaggerWebResponseUserProfiles "Successfully retrieved students"
+// @Failure 400 {object} model.SwaggerWebResponseString "Bad request"
+// @Security BearerAuth
+// @Router /students [get]
 func (s *StudentServiceImpl) FindAll(c *fiber.Ctx) error {
 	ctx := c.UserContext()
 	Students, err := s.repoStudent.FindAll(ctx)
@@ -45,6 +55,17 @@ func (s *StudentServiceImpl) FindAll(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// FindById godoc
+// @Summary Get student by ID
+// @Description Retrieve detailed student profile by ID
+// @Tags Students
+// @Accept json
+// @Produce json
+// @Param id path string true "Student ID"
+// @Success 200 {object} model.SwaggerWebResponseUserProfile "Successfully retrieved student"
+// @Failure 400 {object} model.SwaggerWebResponseString "Student not found"
+// @Security BearerAuth
+// @Router /students/{id} [get]
 func (s *StudentServiceImpl) FindById(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx := c.UserContext()
@@ -64,6 +85,19 @@ func (s *StudentServiceImpl) FindById(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// FindAchievements godoc
+// @Summary Get student achievements
+// @Description Retrieve list of achievements belonging to a student with pagination
+// @Tags Students
+// @Accept json
+// @Produce json
+// @Param id path string true "Student ID"
+// @Param page query int false "Page number" default(1)
+// @Param limit query int false "Page size" default(10)
+// @Success 200 {object} model.SwaggerWebResponseAchievementReferenceAdmin "Successfully retrieved achievements"
+// @Failure 400 {object} model.SwaggerWebResponseString "Bad request"
+// @Security BearerAuth
+// @Router /students/{id}/achievements [get]
 func (s *StudentServiceImpl) FindAchievements(c *fiber.Ctx) error {
 	ctx := c.UserContext()
 	id := c.Params("id")
@@ -84,6 +118,18 @@ func (s *StudentServiceImpl) FindAchievements(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// ChangeAdvisor godoc
+// @Summary Change student advisor
+// @Description Assign or change the academic advisor for a student
+// @Tags Students
+// @Accept json
+// @Produce json
+// @Param id path string true "Student ID"
+// @Param request body model.SwaggerChangeAdvisorRequest true "Advisor ID payload"
+// @Success 200 {object} model.SwaggerWebResponseStudent "Successfully changed advisor"
+// @Failure 400 {object} model.SwaggerWebResponseString "Bad request"
+// @Security BearerAuth
+// @Router /students/{id}/advisor [patch]
 func (s *StudentServiceImpl) ChangeAdvisor(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx := c.UserContext()

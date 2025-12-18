@@ -34,6 +34,19 @@ type UserServiceImpl struct {
 	Log          *logrus.Logger
 }
 
+// UpdateRole godoc
+// @Summary Update user role
+// @Description Update user role and associated profile data (student/lecturer)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Param request body model.UserUpdateRole true "User role update request"
+// @Success 200 {object} model.SwaggerWebResponseInterface "Successfully updated user role"
+// @Failure 400 {object} model.SwaggerWebResponseString "Bad request - invalid input or role ID"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /users/{id}/role [put]
 func (s *UserServiceImpl) UpdateRole(c *fiber.Ctx) error {
 	UserId := c.Params("id")
 	var request model.UserUpdateRole
@@ -186,6 +199,18 @@ func (s *UserServiceImpl) UpdateRole(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// Create godoc
+// @Summary Create new user
+// @Description Create a new user with role-specific profile (student/lecturer/admin)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param request body model.UserCreateRequest true "User creation request"
+// @Success 200 {object} model.SwaggerWebResponseInterface "Successfully created user"
+// @Failure 400 {object} map[string]interface{} "Bad request - validation error or missing profile data"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /users [post]
 func (s *UserServiceImpl) Create(c *fiber.Ctx) error {
 	var request model.UserCreateRequest
 	if err := c.BodyParser(&request); err != nil {
@@ -319,6 +344,19 @@ func (s *UserServiceImpl) Create(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// Update godoc
+// @Summary Update user information
+// @Description Update user's basic information (username, email, fullname)
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Param request body model.UserCreateRequest true "User update request"
+// @Success 200 {object} model.SwaggerWebResponseUserUpdateResponse "Successfully updated user"
+// @Failure 400 {object} model.SwaggerWebResponseString "Bad request - invalid input"
+// @Failure 404 {object} model.SwaggerWebResponseString "User not found"
+// @Security BearerAuth
+// @Router /users/{id} [put]
 func (s *UserServiceImpl) Update(c *fiber.Ctx) error {
 	UserId := c.Params("id")
 	var request model.UserCreateRequest
@@ -361,6 +399,17 @@ func (s *UserServiceImpl) Update(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// Delete godoc
+// @Summary Delete user
+// @Description Delete a user by ID
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} model.SwaggerWebResponseString "Successfully deleted user"
+// @Failure 400 {object} map[string]interface{} "Bad request - user not found"
+// @Security BearerAuth
+// @Router /users/{id} [delete]
 func (s *UserServiceImpl) Delete(c *fiber.Ctx) error {
 	UserId := c.Params("id")
 	ctx := c.UserContext()
@@ -380,6 +429,17 @@ func (s *UserServiceImpl) Delete(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// FindById godoc
+// @Summary Get user by ID
+// @Description Get user details by ID including role-specific profile
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param id path string true "User ID"
+// @Success 200 {object} model.SwaggerWebResponseUserResponse "Successfully retrieved user"
+// @Failure 404 {object} model.SwaggerWebResponseString "User not found"
+// @Security BearerAuth
+// @Router /users/{id} [get]
 func (s *UserServiceImpl) FindById(c *fiber.Ctx) error {
 	var UserID = c.Params("id")
 	ctx := c.UserContext()
@@ -422,6 +482,16 @@ func (s *UserServiceImpl) FindById(c *fiber.Ctx) error {
 
 }
 
+// FindAll godoc
+// @Summary Get all users
+// @Description Get list of all users
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.SwaggerWebResponseUserResponses "Successfully retrieved users"
+// @Failure 500 {object} map[string]interface{} "Internal server error"
+// @Security BearerAuth
+// @Router /users [get]
 func (s *UserServiceImpl) FindAll(c *fiber.Ctx) error {
 
 	ctx := c.UserContext()
@@ -450,6 +520,16 @@ func (s *UserServiceImpl) FindAll(c *fiber.Ctx) error {
 
 }
 
+// Profile godoc
+// @Summary Get current user profile
+// @Description Get authenticated user's profile information
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Success 200 {object} model.SwaggerWebResponseUserResponse "Successfully retrieved profile"
+// @Failure 404 {object} model.SwaggerWebResponseString "User not found"
+// @Security BearerAuth
+// @Router /users/profile [get]
 func (s *UserServiceImpl) Profile(c *fiber.Ctx) error {
 	ctx := c.UserContext()
 	val := ctx.Value("user")

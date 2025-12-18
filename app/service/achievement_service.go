@@ -45,6 +45,19 @@ func NewAchievementService(repo repository.AchievementRepository, repoStudent re
 	}
 }
 
+// Create godoc
+// @Summary      Create a new achievement
+// @Description  Create a new achievement draft for a student.
+// @Tags         Achievement
+// @Accept       json
+// @Produce      json
+// @Param        request body model.CreateAchievementRequest true "Create Request"
+// @Success      201  {object}  model.WebResponse[model.AchievementReference]
+// @Failure      400  {object}  model.WebResponse[string]
+// @Failure      404  {object}  model.WebResponse[string]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /achievements [post]
 func (s *AchievementServiceImpl) Create(c *fiber.Ctx) error {
 	var request model.CreateAchievementRequest
 	if err := c.BodyParser(&request); err != nil {
@@ -108,6 +121,19 @@ func (s *AchievementServiceImpl) Create(c *fiber.Ctx) error {
 	})
 }
 
+// Update godoc
+// @Summary      Update an achievement
+// @Description  Update achievement details. Students can only update if status is 'draft'.
+// @Tags         Achievement
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Achievement ID"
+// @Param        request body model.UpdateAchievementRequest true "Update Request"
+// @Success      200  {object}  model.WebResponse[model.AchievementReferenceDetail]
+// @Failure      400  {object}  model.WebResponse[string]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /achievements/{id} [put]
 func (s *AchievementServiceImpl) Update(c *fiber.Ctx) error {
 	Id := c.Params("id")
 	var request model.UpdateAchievementRequest
@@ -174,6 +200,17 @@ func (s *AchievementServiceImpl) Update(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// Delete godoc
+// @Summary      Delete an achievement
+// @Description  Delete achievement by ID.
+// @Tags         Achievement
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Achievement ID"
+// @Success      200  {object}  model.WebResponse[string]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /achievements/{id} [delete]
 func (s *AchievementServiceImpl) Delete(c *fiber.Ctx) error {
 	//TODO implement me
 	Id := c.Params("id")
@@ -194,6 +231,17 @@ func (s *AchievementServiceImpl) Delete(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// FindByID godoc
+// @Summary      Get achievement by ID
+// @Description  Retrieve full details of an achievement including mongo data.
+// @Tags         Achievement
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Achievement ID"
+// @Success      200  {object}  model.WebResponse[model.AchievementReferenceDetail]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /achievements/{id} [get]
 func (s *AchievementServiceImpl) FindByID(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx := c.UserContext()
@@ -223,6 +271,18 @@ func (s *AchievementServiceImpl) FindByID(c *fiber.Ctx) error {
 	})
 }
 
+// FindAll godoc
+// @Summary      Get all achievements
+// @Description  Get achievements with pagination. Results filtered by user role (admin, mahasiswa, lecturer).
+// @Tags         Achievement
+// @Accept       json
+// @Produce      json
+// @Param        page query int false "Page number"
+// @Param        limit query int false "Limit per page"
+// @Success      200  {object}  model.WebResponse[[]model.AchievementReferenceDetail]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /achievements [get]
 func (s *AchievementServiceImpl) FindAll(c *fiber.Ctx) error {
 
 	Page := c.QueryInt("page", 1)
@@ -374,6 +434,17 @@ func (s *AchievementServiceImpl) FindAll(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// Verify godoc
+// @Summary      Verify an achievement
+// @Description  Mark an achievement as verified.
+// @Tags         Achievement
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Achievement ID"
+// @Success      200  {object}  model.WebResponse[model.AchievementReferenceDetail]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /achievements/{id}/verify [patch]
 func (s *AchievementServiceImpl) Verify(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx := c.UserContext()
@@ -418,6 +489,17 @@ func (s *AchievementServiceImpl) Verify(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// Submit godoc
+// @Summary      Submit an achievement
+// @Description  Submit an achievement for review.
+// @Tags         Achievement
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Achievement ID"
+// @Success      200  {object}  model.WebResponse[model.AchievementReferenceDetail]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /achievements/{id}/submit [patch]
 func (s *AchievementServiceImpl) Submit(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx := c.UserContext()
@@ -461,6 +543,17 @@ func (s *AchievementServiceImpl) Submit(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
+// History godoc
+// @Summary      Get achievement history
+// @Description  Get the timeline history of an achievement.
+// @Tags         Achievement
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Achievement ID"
+// @Success      200  {object}  model.WebResponse[[]model.AchievementHistory]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /achievements/{id}/history [get]
 func (s *AchievementServiceImpl) History(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx := c.UserContext()
@@ -490,10 +583,10 @@ func (s *AchievementServiceImpl) History(c *fiber.Ctx) error {
 
 	if achievement.VerifiedAt != nil {
 		actionLabel := "Diverifikasi"
-		if achievement.Status == "REJECTED" {
-			actionLabel = "Ditolak"
-		} else if achievement.Status == "APPROVED" {
-			actionLabel = "Disetujui"
+		if achievement.Status == "rejected" {
+			actionLabel = "rejected"
+		} else if achievement.Status == "verified" {
+			actionLabel = "verified"
 		}
 
 		histories = append(histories, model.AchievementHistory{
@@ -512,6 +605,19 @@ func (s *AchievementServiceImpl) History(c *fiber.Ctx) error {
 	})
 }
 
+// Attachment godoc
+// @Summary      Upload attachment
+// @Description  Upload file attachments for an achievement.
+// @Tags         Achievement
+// @Accept       multipart/form-data
+// @Produce      json
+// @Param        id   path      string  true  "Achievement ID"
+// @Param        attachments formData file true "Files to upload"
+// @Success      200  {object}  model.WebResponse[model.AchievementReferenceDetail]
+// @Failure      400  {object}  model.WebResponse[string]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /achievements/{id}/attachments [post]
 func (s *AchievementServiceImpl) Attachment(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx := c.UserContext()
@@ -597,6 +703,19 @@ func (s *AchievementServiceImpl) Attachment(c *fiber.Ctx) error {
 	})
 }
 
+// Reject godoc
+// @Summary      Reject an achievement
+// @Description  Reject a submitted achievement with a note.
+// @Tags         Achievement
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Achievement ID"
+// @Param        request body model.CreateRejection true "Rejection Note"
+// @Success      200  {object}  model.WebResponse[model.AchievementReferenceDetail]
+// @Failure      400  {object}  model.WebResponse[string]
+// @Failure      500  {object}  model.WebResponse[string]
+// @Security     BearerAuth
+// @Router       /achievements/{id}/reject [post]
 func (s *AchievementServiceImpl) Reject(c *fiber.Ctx) error {
 	id := c.Params("id")
 	ctx := c.UserContext()
